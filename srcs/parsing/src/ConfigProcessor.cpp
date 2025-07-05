@@ -1,6 +1,23 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ConfigProcessor.cpp                                :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jfranco <jfranco@student.s19.be>           +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/05 19:28:53 by jfranco           #+#    #+#             */
+/*   Updated: 2025/07/05 19:28:54 by jfranco          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../include/ConfigProcessor.hpp"
 
        /*♡♡♡♡♡♡♡♡♡♡♡CTOR♡♡♡♡♡♡♡♡♡♡♡♡♡*/
+ConfigProcessor::ConfigProcessor(const std::string& Path)
+			: PathFile(Path)
+{
+	std::cout << this->PathFile << "\n";
+}
 ConfigProcessor::ConfigProcessor()
 {
     //std::cout << "Default constructor called" << std::endl;
@@ -14,6 +31,26 @@ ConfigProcessor::ConfigProcessor(ConfigProcessor const & src)
 }
 
        /*♡♡♡♡♡♡♡♡♡♡♡GETTER♡♡♡♡♡♡♡♡♡♡♡♡♡*/
+std::string ConfigProcessor::getPath( void ) const
+{
+	return (this->PathFile);
+}
+
+std::string ConfigProcessor::getBuffer( void ) const
+{
+	return (this->Buffer);
+}
+
+void	ConfigProcessor::printAllTree( void ) const
+{
+	std::vector<Node>::const_iterator it = tree.begin();
+	while(it != tree.end())
+	{
+		std::cout << "ALEBRO" << std::endl;
+		it->printTree();
+		++it;
+	}
+}
  
        /*♡♡♡♡♡♡♡♡♡♡♡FT♡♡♡♡♡♡♡♡♡♡♡♡♡*/
 std::string ConfigProcessor::findRemplaceComment(std::string const& input, std::string const& from,
@@ -30,7 +67,7 @@ std::string ConfigProcessor::findRemplaceComment(std::string const& input, std::
     {                                          
         result.append(input, start, pos - start);
         result += to;
-        start = posEnd + delimiter.length();
+        start = posEnd + (dilimiter.length());
     }                                          
     result.append(input, start, input.size() - start);
 	pos = input.find(from, start);
@@ -42,20 +79,106 @@ std::string ConfigProcessor::findRemplaceComment(std::string const& input, std::
     return result;                             
 }
 
-void ConfigProcessor::tokenize(void)
+void	ConfigProcessor::RicorsiveTree(std::stringstream& sstoken, bool flags)
+{
+	std::string token;
+	char c;
+    if (!(sstoken >> token))
+	{
+        return;
+	}
+	sstoken >> std::ws;  // salta spazi bianchi (spazi, tab, newline)
+	c = sstoken.peek();
+	if (token == "server" && c == '{' && flags == true)
+	{
+		Node root;
+        root.name = token;  // salva il tipo di blocco
+        treeParser(sstoken, root);  // costruisci il sottoalbero
+        tree.push_back(root);       // aggiungi alla foresta
+	}
+	else if (flags == false && token == "{")
+	{
+		Node root;
+        root.name = token;  // salva il tipo di blocco
+        treeParser(sstoken, root);  // costruisci il sottoalbero
+        tree.push_back(root);       // aggiungi alla foresta
+	}
+	RicorsiveTree(sstoken);
+}
+
+void	ConfigProcessor::treeParser(std::stringstream& sstoken, Node& current)
+{
+	std::string token;
+	if (!(sstoken >> token))
+		return;
+
+
+        while (sstoken >> token)
+		{
+            if (token == "{")
+			{
+                Node child;
+                treeParser(sstoken, child);
+                current.children.push_back(child);
+            }
+			else if (token == "server")
+				RicorsiveTree(sstoken, false);
+			else
+			{
+				if (token == "}")
+				{
+					sstoken >> token;
+					current.name = token;
+					return ;
+				}
+            	current.array.push_back(token);
+            }
+        }
+        return;
+}
+
+void ConfigProcessor::tokenize( void )
 {
 	std::ifstream file(this->PathFile);
+
+
 	if(!file ||file.eof())
 	{
-
+		// TODO:(e.g., log or throw an exception) ♡♡♡♡♡♡
+		std::cout << "Error stream" << std::endl;
+		return ;
 	}
+
+/* ♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡
+	// Use a stringstream to read the entire file content into memory ♡♡♡♡♡♡
+ ♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡ */
 	std::stringstream ss;
 	ss << file.rdbuf();
 	this->Buffer = ss.str();
-	this->Buffer = findRemplaceComment(this->Buffer, "#", "\n", "");
+/* ♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡
+     * Remove all comments from the buffer:
+     * Look for each '#' character (start of comment)
+     * and remove everything up to the newline character '\n'.
+     * The `findRemplaceComment` function performs this operation. 
+ ♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡ */
+	this->Buffer = findRemplaceComment(this->Buffer, "#", "\n", "\n");
+/* ♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡
+ * Create a stringstream from the cleaned buffer, allowing tokenization using >>.
+ * Then pass it to treeParser for building the configuration tree structure.
+ ♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡ */
 
-	/*I remove all coments from the buffer,
-	  when there is a # up to the /n*/
+    std::stringstream tokenStream(this->Buffer);
+	if (tokenStream.fail())
+	{
+	    std::cout << "Errore di formato o estrazione fallita (failbit set)" << std::endl;
+	    if (tokenStream.eof())
+	        std::cout << "Si è raggiunta la fine dello stream (eofbit set)" << std::endl;
+	    if (tokenStream.bad())
+	        std::cout << "Errore grave di stream (badbit set)" << std::endl;
+	}
+	else
+		std::cout << "Lettura avvenuta con succetokenStreamo: " << std::endl;
+	RicorsiveTree(tokenStream);
 }
  
        /*♡♡♡♡♡♡♡♡♡♡♡OPERATOR♡♡♡♡♡♡♡♡♡♡♡♡♡*/
