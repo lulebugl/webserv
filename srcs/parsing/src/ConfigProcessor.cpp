@@ -91,46 +91,65 @@ void	ConfigProcessor::RicorsiveTree(std::stringstream& sstoken, bool flags)
 	c = sstoken.peek();
 	if (token == "server" && c == '{' && flags == true)
 	{
+		Logger::info() << "Push one tree";
+		sstoken.get();
 		Node root;
         root.name = token;  // salva il tipo di blocco
         treeParser(sstoken, root);  // costruisci il sottoalbero
         tree.push_back(root);       // aggiungi alla foresta
 	}
-	else if (flags == false && token == "{")
-	{
-		Node root;
-        root.name = token;  // salva il tipo di blocco
-        treeParser(sstoken, root);  // costruisci il sottoalbero
-        tree.push_back(root);       // aggiungi alla foresta
-	}
+//	else if (flags == false && token == "{")
+//	{
+//		Logger::info() << "Push new Tree";
+//		Node root;
+//        root.name = token;  // salva il tipo di blocco
+//        treeParser(sstoken, root);  // costruisci il sottoalbero
+//        tree.push_back(root);       // aggiungi alla foresta
+//	}
+/* ♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡
+ * TODO: Vedere se togliere il blocca else if per avre server in cascata
+ ♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡ */
 	RicorsiveTree(sstoken);
 }
 
 void	ConfigProcessor::treeParser(std::stringstream& sstoken, Node& current)
 {
 	std::string token;
+	std::string rest;
 	if (!(sstoken >> token))
 		return;
 
 
         while (sstoken >> token)
 		{
-            if (token == "{")
+            if (token == "location")
 			{
-                Node child;
-                treeParser(sstoken, child);
-                current.children.push_back(child);
+				//std::getline(sstoken >> std::ws, rest);
+				while (sstoken >> token && token != "{")
+					rest = rest + token;
+				//rest.erase(rest.find_last_not_of(" \t\r\n") + 1);
+				if (token == "{")
+				{
+					 Node child;
+					 child.name = rest;
+					 rest = "";
+	               	 treeParser(sstoken, child);
+	               	 current.children.push_back(child);
+					 Logger::info() << "Push Node: " << child.name;
+				}
+				else
+				{
+					Logger::error() << "Bracket don't open corretly";
+					return;
+					// TODO: Da gestire corretamente;
+				}
             }
-			else if (token == "server")
-				RicorsiveTree(sstoken, false);
+//			else if (token == "server")   // TODO:Vedere se togliere questo blocco
+//				RicorsiveTree(sstoken, false);
 			else
 			{
 				if (token == "}")
-				{
-					sstoken >> token;
-					current.name = token;
 					return ;
-				}
             	current.array.push_back(token);
             }
         }
@@ -170,6 +189,23 @@ void	ConfigProcessor::ValidationPath() const
 	}
 }
 
+void	ConfigProcessor::countBracket() const
+{
+	int bracket = 0;
+	for (size_t i = 0; i < Buffer.length(); ++i) {
+		if (this->Buffer[i] == '{')
+			bracket++;
+		if (this->Buffer[i] == '}')
+			bracket--;
+	}
+	if (bracket != 0)
+	{
+		Logger::error() << "Brackets don't close properly";
+		exit(-1);
+	}
+	return ;
+}
+
 void ConfigProcessor::tokenize( void )
 {
 	ValidationPath();
@@ -195,6 +231,7 @@ void ConfigProcessor::tokenize( void )
      * The `findRemplaceComment` function performs this operation. 
  ♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡ */
 	this->Buffer = findRemplaceComment(this->Buffer, "#", "\n", "\n");
+	countBracket();
 /* ♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡
  * Create a stringstream from the cleaned buffer, allowing tokenization using >>.
  * Then pass it to treeParser for building the configuration tree structure.

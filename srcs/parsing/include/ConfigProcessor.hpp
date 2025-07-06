@@ -45,6 +45,7 @@ class ConfigProcessor
 	   void	StreamErrorFind(std::stringstream& ss) const;
        /*♡♡♡♡♡♡♡♡♡♡♡FT_VALIDATION♡♡♡♡♡♡♡♡♡♡♡♡♡*/
 	   void ValidationPath( void ) const;
+		void	countBracket() const;
        /*♡♡♡♡♡♡♡♡♡♡♡OPERATOR♡♡♡♡♡♡♡♡♡♡♡♡♡*/
        ConfigProcessor& operator=(ConfigProcessor const & rsh);    //Cannon
  
