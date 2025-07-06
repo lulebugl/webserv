@@ -1,6 +1,8 @@
 #ifndef CONFIGPROCESSOR_H
 #define CONFIGPROCESSOR_H
 
+
+#include "../../../includes/Logger.hpp"
 #include <vector>
 #include <iostream>
 #include <string>
@@ -39,6 +41,10 @@ class ConfigProcessor
 	   void	RicorsiveTree(std::stringstream& sstoken, bool flags = true);
 	   void	treeParser(std::stringstream& sstoken, Node& token);
 	   void	tokenize( void );
+       /*♡♡♡♡♡♡♡♡♡♡♡FT_MSG_ERROR♡♡♡♡♡♡♡♡♡♡♡♡♡*/
+	   void	StreamErrorFind(std::stringstream& ss) const;
+       /*♡♡♡♡♡♡♡♡♡♡♡FT_VALIDATION♡♡♡♡♡♡♡♡♡♡♡♡♡*/
+	   void ValidationPath( void ) const;
        /*♡♡♡♡♡♡♡♡♡♡♡OPERATOR♡♡♡♡♡♡♡♡♡♡♡♡♡*/
        ConfigProcessor& operator=(ConfigProcessor const & rsh);    //Cannon
  

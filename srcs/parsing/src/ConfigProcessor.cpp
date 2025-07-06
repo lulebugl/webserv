@@ -137,11 +137,43 @@ void	ConfigProcessor::treeParser(std::stringstream& sstoken, Node& current)
         return;
 }
 
+void	ConfigProcessor::StreamErrorFind(std::stringstream& ss) const
+{
+	if (ss.fail())
+	{
+	    std::cerr << "Errore di formato o estrazione fallita (failbit set)" << std::endl;
+	    if (ss.eof())
+	        std::cerr << "Si è raggiunta la fine dello stream (eofbit set)" << std::endl;
+	    if (ss.bad())
+	        std::cerr << "Errore grave di stream (badbit set)" << std::endl;
+	}
+	else
+		Logger::info() << "Stream OK!";
+
+}
+
+void	ConfigProcessor::ValidationPath() const
+{
+	const std::string exte = ".conf";
+	size_t	posDoth = PathFile.rfind(exte);
+	if (posDoth != std::string::npos)
+	{
+        if (posDoth == (PathFile.length() - exte.length()))
+					Logger::info() << "Valid extension, try open file";
+		else
+			exit (-1);
+
+	}
+	else
+	{
+			exit (-1);
+	}
+}
+
 void ConfigProcessor::tokenize( void )
 {
+	ValidationPath();
 	std::ifstream file(this->PathFile);
-
-
 	if(!file ||file.eof())
 	{
 		// TODO:(e.g., log or throw an exception) ♡♡♡♡♡♡
@@ -153,6 +185,7 @@ void ConfigProcessor::tokenize( void )
 	// Use a stringstream to read the entire file content into memory ♡♡♡♡♡♡
  ♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡ */
 	std::stringstream ss;
+	StreamErrorFind(ss);
 	ss << file.rdbuf();
 	this->Buffer = ss.str();
 /* ♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡
@@ -168,16 +201,7 @@ void ConfigProcessor::tokenize( void )
  ♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡ */
 
     std::stringstream tokenStream(this->Buffer);
-	if (tokenStream.fail())
-	{
-	    std::cout << "Errore di formato o estrazione fallita (failbit set)" << std::endl;
-	    if (tokenStream.eof())
-	        std::cout << "Si è raggiunta la fine dello stream (eofbit set)" << std::endl;
-	    if (tokenStream.bad())
-	        std::cout << "Errore grave di stream (badbit set)" << std::endl;
-	}
-	else
-		std::cout << "Lettura avvenuta con succetokenStreamo: " << std::endl;
+	StreamErrorFind(tokenStream);	
 	RicorsiveTree(tokenStream);
 }
  

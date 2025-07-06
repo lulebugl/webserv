@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Logger.hpp"
+#include "../../includes/Logger.hpp"
 
 #include <iostream>
 #include <string>
