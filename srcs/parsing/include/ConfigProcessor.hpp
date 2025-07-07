@@ -17,11 +17,12 @@ struct	Node
 	std::string name;
 	std::vector<std::string> array;
 	std::vector<Node> children;
-	std::map<std::string, std::vector<std::string> > args; 
-	void pushArgInMap( void );
+	std::map<std::string, std::vector<std::string> > prmtrs; 
+	void	pushArgInMap( void );
+	void	printMap(void)const;
 
-	void printSubtree(const std::string &prefix, bool isLast) const;
-	void printTree() const ;
+	void	printSubtree(const std::string &prefix, bool isLast) const;
+	void	printTree() const ;
 };
 
  
@@ -37,20 +38,10 @@ class ConfigProcessor
 	   std::string	getBuffer( void ) const;
 	   void			printAllTree( void ) const;
 
- 
+
        /*♡♡♡♡♡♡♡♡♡♡♡FT♡♡♡♡♡♡♡♡♡♡♡♡♡*/
-	   std::string findRemplaceComment(std::string const& input,
-			   std::string const& from, std::string const& dilimiter,
-			   std::string const& to);  
-	   void	RicorsiveTree(std::stringstream& sstoken, bool flags = true);
-	   void	treeParser(std::stringstream& sstoken, Node& token);
 	   void	tokenize( void );
-       /*♡♡♡♡♡♡♡♡♡♡♡FT_MSG_ERROR♡♡♡♡♡♡♡♡♡♡♡♡♡*/
-	   void	StreamErrorFind(std::stringstream& ss) const;
-       /*♡♡♡♡♡♡♡♡♡♡♡FT_VALIDATION♡♡♡♡♡♡♡♡♡♡♡♡♡*/
-	   void ValidationPath( void ) const;
-		void	countBracket() const;
-       /*♡♡♡♡♡♡♡♡♡♡♡OPERATOR♡♡♡♡♡♡♡♡♡♡♡♡♡*/
+
        ConfigProcessor& operator=(ConfigProcessor const & rsh);    //Cannon
  
        /*♡♡♡♡♡♡♡♡♡♡♡DTOR♡♡♡♡♡♡♡♡♡♡♡♡♡*/
@@ -60,6 +51,20 @@ class ConfigProcessor
 	   const std::string	PathFile;
 	   std::string		Buffer;
 	   std::vector<Node> tree;
+       /*♡♡♡♡♡♡♡♡♡♡♡FT♡♡♡♡♡♡♡♡♡♡♡♡♡*/
+	   std::string findRemplaceComment(std::string const& input,
+			   std::string const& from, std::string const& dilimiter,
+			   std::string const& to);  
+	   void	RicorsiveTree(std::stringstream& sstoken, bool flags = true);
+	   void	treeParser(std::stringstream& sstoken, Node& token);
+       /*♡♡♡♡♡♡♡♡♡♡♡FT_MSG_ERROR♡♡♡♡♡♡♡♡♡♡♡♡♡*/
+	   void	StreamErrorFind(std::stringstream& ss) const;
+       /*♡♡♡♡♡♡♡♡♡♡♡FT_VALIDATION♡♡♡♡♡♡♡♡♡♡♡♡♡*/
+	   void ValidationPath( void ) const;
+		void	countBracket() const;
+		void	recursiveMap( void );
+		void	validationParameters( void ) const;
+       /*♡♡♡♡♡♡♡♡♡♡♡OPERATOR♡♡♡♡♡♡♡♡♡♡♡♡♡*/
 
 };
  std::ostream &operator<<(std::ostream &o, const ConfigProcessor &rhs);

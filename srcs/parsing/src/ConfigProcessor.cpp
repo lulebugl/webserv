@@ -46,9 +46,20 @@ void	ConfigProcessor::printAllTree( void ) const
 	std::vector<Node>::const_iterator it = tree.begin();
 	while(it != tree.end())
 	{
-		std::cout << "ALEBRO" << std::endl;
+		Logger::info() << "Schema Alberi e nodi";
 		it->printTree();
 		++it;
+	}
+	std::cout << "\n\n";
+	std::vector<Node>::const_iterator it_ = tree.begin();
+	while(it_ != tree.end())
+	{
+		std::cout << "Genitore" << "\n";
+		it_->printMap();
+		std::cout << "Figli" << "\n";
+		  for (size_t i = 0; i < it_->children.size(); ++i)
+	  	      it_->children[i].printMap();
+		++it_;
 	}
 }
  
@@ -77,6 +88,26 @@ std::string ConfigProcessor::findRemplaceComment(std::string const& input, std::
 	   	result += to;
 	}
     return result;                             
+}
+
+void	ConfigProcessor::validationParameters(const std::map<std::string, std::vector<std::string> >& check)const
+{
+	std::map<std::string, std::vector<std::string> >::const_iterator it = check.begin();
+	while(it_ != check.end())
+	{
+		std::string key = it->first;
+		std::vector<std::string> value = it->second;
+		if (key == info)
+		{
+			try
+			{
+			}
+			catch (...)
+			{
+			}
+		}
+
+	}
 }
 
 void	ConfigProcessor::RicorsiveTree(std::stringstream& sstoken, bool flags)
@@ -200,6 +231,19 @@ void	ConfigProcessor::countBracket() const
 	return ;
 }
 
+void	ConfigProcessor::recursiveMap( void )
+{
+
+	std::vector<Node>::iterator it = tree.begin();
+	while(it != tree.end())
+	{
+		it->pushArgInMap();
+		  for (size_t i = 0; i < it->children.size(); ++i)
+	  	      it->children[i].pushArgInMap();
+		++it;
+	}
+}
+
 void ConfigProcessor::tokenize( void )
 {
 	ValidationPath();
@@ -234,6 +278,7 @@ void ConfigProcessor::tokenize( void )
     std::stringstream tokenStream(this->Buffer);
 	StreamErrorFind(tokenStream);	
 	RicorsiveTree(tokenStream);
+	recursiveMap();
 }
  
        /*♡♡♡♡♡♡♡♡♡♡♡OPERATOR♡♡♡♡♡♡♡♡♡♡♡♡♡*/
