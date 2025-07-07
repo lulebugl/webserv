@@ -9,12 +9,16 @@
 #include <sstream>   // ← necessario per std::stringstream
 #include <iostream>  // ← se usi std::cout
 #include <fstream>   // ← se usi std::ifstream
+#include <map>   // ← se usi std::map
+#include <cstdlib> // necessario per exit()
 
 struct	Node
 {
 	std::string name;
 	std::vector<std::string> array;
 	std::vector<Node> children;
+	std::map<std::string, std::vector<std::string> > args; 
+	void pushArgInMap( void );
 
 	void printSubtree(const std::string &prefix, bool isLast) const;
 	void printTree() const ;

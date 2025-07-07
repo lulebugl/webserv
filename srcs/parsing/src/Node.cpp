@@ -1,18 +1,28 @@
 
 #include "../include/ConfigProcessor.hpp"
-#include "../include/ConfigProcessor.hpp"
-#include "../include/ConfigProcessor.hpp"
-#include "../include/ConfigProcessor.hpp"
-#include "../include/ConfigProcessor.hpp"
+void Node::pushArgInMap( void )
+{
+	std::vector<std::string>::iterator it;
+	std::string info;
+	for (it = array.begin(); it != array.end(); ++it)
+	{
+		std::string key = *it;
+		if (*it.back() != ";")
+		std::cout << *it << "\n";
+		it++;
+	}
 
-void Node::printTree() const {
+}
+
+void Node::printTree( void ) const 
+{
     std::cout << name << "\n";
 	std::vector<std::string>::const_iterator it = array.begin();
 
 	while(it != array.end())
 	{
 		std::cout << *it << "\n";
-		++it;
+		it++;
 	}
     for (size_t i = 0; i < children.size(); ++i) {
         bool isLast = (i == children.size() - 1);

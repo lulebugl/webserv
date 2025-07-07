@@ -84,9 +84,7 @@ void	ConfigProcessor::RicorsiveTree(std::stringstream& sstoken, bool flags)
 	std::string token;
 	char c;
     if (!(sstoken >> token))
-	{
         return;
-	}
 	sstoken >> std::ws;  // salta spazi bianchi (spazi, tab, newline)
 	c = sstoken.peek();
 	if (token == "server" && c == '{' && flags == true)
@@ -205,7 +203,7 @@ void	ConfigProcessor::countBracket() const
 void ConfigProcessor::tokenize( void )
 {
 	ValidationPath();
-	std::ifstream file(this->PathFile);
+	std::ifstream file(this->PathFile.c_str());
 	if(!file ||file.eof())
 	{
 		// TODO:(e.g., log or throw an exception) ♡♡♡♡♡♡
