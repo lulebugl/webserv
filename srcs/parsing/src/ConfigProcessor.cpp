@@ -116,9 +116,6 @@ void	ConfigProcessor::treeParser(std::stringstream& sstoken, Node& current)
 {
 	std::string token;
 	std::string rest;
-	if (!(sstoken >> token))
-		return;
-
 
         while (sstoken >> token)
 		{
@@ -132,7 +129,7 @@ void	ConfigProcessor::treeParser(std::stringstream& sstoken, Node& current)
 				{
 					 Node child;
 					 child.name = rest;
-					 rest = "";
+					 rest.clear(); 
 	               	 treeParser(sstoken, child);
 	               	 current.children.push_back(child);
 					 Logger::info() << "Push Node: " << child.name;
@@ -168,7 +165,6 @@ void	ConfigProcessor::StreamErrorFind(std::stringstream& ss) const
 	}
 	else
 		Logger::info() << "Stream OK!";
-
 }
 
 void	ConfigProcessor::ValidationPath() const
