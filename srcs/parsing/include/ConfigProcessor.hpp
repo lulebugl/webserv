@@ -11,7 +11,25 @@
 #include <fstream>   // ← se usi std::ifstream
 #include <map>   // ← se usi std::map
 #include <cstdlib> // necessario per exit()
-
+struct Validator
+{
+	private:
+		st::map<std::string, std::function<void(std::vector<string>)>;
+	public:
+		void	validateIp();
+		void	validateCgiPath();
+		void	validateListen();
+		void	validateServerName();
+		void	validateErrorPage();
+		void	validateClienMaxBody();
+		void	validateRoot();
+		void	validateIndex();
+		void	validateAutoIndex();
+		void	validateMethods();
+		void	validateAlias();
+		void	validateReturns();
+		void	validateCgiExt():
+}
 struct	Node
 {
 	std::string name;
