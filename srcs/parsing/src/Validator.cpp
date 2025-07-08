@@ -21,38 +21,39 @@ Validator::Validator()
 void	Validator::validateIp( std::vector<std::string>& prmtrs )
 {
 	if (prmtrs.size() > 1)
-		throw ipVectorSizeToHight();
+		throw VectorSizeToHight();
 	if (prmtrs.size() < 1)
-		throw ipVectorSizeToLow();
-	size_t	i = 0;
-	size_t	doth = 0;
-	while (prmtrs[0].length() < i)
-	{
-		size_t pos = prmtrs[0].find('.', i);
-        if (pos == std::string::npos)
-            pos = prmtrs[0].length();  // se non c'è punto, segmenta fino alla fine
-		else
-			doth++;
-		std::string sub = prmtrs[0].substr(i, pos - i);
-		if (sub.length() > 3)
-			throw ToManyDigitInIp();
-		if (sub.empty())
-			throw IpEmpty();
-		size_t	y = 0;
-		while (y < sub.length())
-		{
-			if (!std::isdigit(sub[y]))
-				throw onlyDigitInIp();
-			y++;
-		}
-		i++;
-	}
-	if (doth == 2)
-		Logger::info() << "Ip address OK!";
-	else
-		throw ToManyDothInIp();
+		throw VectorSizeToLow();
+	std::string s = prmtrs[0];
+	std::vector<std::string> v;
+	 std::stringstream ss(s);
+    while (ss.good())
+    {
+		std::string substr;
+       	std::getline(ss, substr, '.');
+		v.push_back(substr);
+    }
+    if (v.size() != 4)
+			throw DontValidIp();
+    for (int i = 0; i < v.size(); i++)
+    {
+		std::string temp = v[i];
+        if (temp.size() > 1)
+        {
+            if (temp[0] == '0')
+				throw DontValidIp();
+        }
+        for (int j = 0; j < temp.size(); j++)
+        {
+            if (std::isalpha(temp[j]))
+				throw DontValidIp();
+        }
+
+        if (std::stoi(temp) > 255)
+				throw DontValidIp();
+    }
 }
-const char* Validator::ToManyDothInIp::what() const throw()
+const char* Validator::ToManyDoth::what() const throw()
 {
     return "Too many dots in IP address";
 }
@@ -67,32 +68,32 @@ const char* Validator::indexMethods::what() const throw()
     return "Invalid index method";
 }
 
-const char* Validator::ipOutOfRange::what() const throw()
+const char* Validator::OutOfRange::what() const throw()
 {
     return "IP out of valid range";
 }
 
-const char* Validator::ipVectorSizeToHight::what() const throw()
+const char* Validator::VectorSizeToHight::what() const throw()
 {
     return "IP vector size too high";
 }
 
-const char* Validator::ipVectorSizeToLow::what() const throw()
+const char* Validator::VectorSizeToLow::what() const throw()
 {
     return "IP vector size too low";
 }
 
-const char* Validator::ToManyDigitInIp::what() const throw()
+const char* Validator::DontValidIp::what() const throw()
 {
     return "Too many digits in IP address";
 }
 
-const char* Validator::IpEmpty::what() const throw()
+const char* Validator::Empty::what() const throw()
 {
     return "IP address empty";
 }
 
-const char* Validator::onlyDigitInIp::what() const throw()
+const char* Validator::onlyDigit::what() const throw()
 {
     return "IP contains only digits";
 }

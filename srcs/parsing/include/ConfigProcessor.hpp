@@ -15,7 +15,7 @@ struct Validator
 {
 	Validator(); // ctor
    std::map<std::string, void(*)(std::vector<std::string>& )> funcMap;
-		void	(Validator::*_FunPTR[4])(std::vector<std::string>&);
+		void	(Validator::*_FunPTR[12])(std::vector<std::string>&);
        /*♡♡♡♡♡♡♡♡♡♡♡FT_VALIDATE♡♡♡♡♡♡♡♡♡♡♡♡♡*/
 		static void	validateIp(std::vector<std::string>& prmtrs);
 //		void	validateCgiPath(std::vector<std::string> prmtrs);
@@ -31,7 +31,7 @@ struct Validator
 //		void	validateReturns(std::vector<std::string> prmtrs);
 //		void	validateCgiExt(std::vector<std::string> prmtrs):
        /*♡♡♡♡♡♡♡♡♡♡♡EXCPTION♡♡♡♡♡♡♡♡♡♡♡♡♡*/
-		class ToManyDothInIp : public std::exception 
+		class ToManyDoth : public std::exception 
 		{
 			public:
 				virtual const char* what() const throw();  // dichiarazione
@@ -46,34 +46,34 @@ struct Validator
 			public:
 				virtual const char* what() const throw();  // dichiarazione
 		};
-		class ipOutOfRange: public std::exception 
+		class OutOfRange: public std::exception 
 		{
 			public:
 				virtual const char* what() const throw();  // dichiarazione
 		};
-		class ipVectorSizeToHight : public std::exception 
+		class VectorSizeToHight : public std::exception 
 		{
 			public:
 				virtual const char* what() const throw();  // dichiarazione
 		};
-		class ipVectorSizeToLow : public std::exception 
+		class VectorSizeToLow : public std::exception 
 		{
 			public:
 				virtual const char* what() const throw();  // dichiarazione
 		};
-		class  ToManyDigitInIp : public std::exception 
+		class  DontValidIp : public std::exception 
 		{
 			public:
 				virtual const char* what() const throw();  // dichiarazione
 		};
 		
-		class  IpEmpty: public std::exception 
+		class  Empty: public std::exception 
 		{
 			public:
 				virtual const char* what() const throw();  // dichiarazione
 		};
 
-		class  onlyDigitInIp: public std::exception 
+		class  onlyDigit: public std::exception 
 		{
 			public:
 				virtual const char* what() const throw();  // dichiarazione

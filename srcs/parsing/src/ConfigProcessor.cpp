@@ -105,6 +105,11 @@ void	ConfigProcessor::validationParameters()
 				{
 					itFunc->second(itPrmtrs->second);
 				}
+				catch (Validator::DontValidIp &e)
+				{
+					Logger::warning() << "Defalt ip set";
+					itPrmtrs->second[0] = "127.0.0.1";
+				}
 				catch (...)
 				{
 					Logger::error( )<< "Catch error";
