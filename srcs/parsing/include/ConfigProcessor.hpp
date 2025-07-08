@@ -13,23 +13,73 @@
 #include <cstdlib> // necessario per exit()
 struct Validator
 {
-	private:
-		st::map<std::string, std::function<void(std::vector<string>)>;
-	public:
-		void	validateIp();
-		void	validateCgiPath();
-		void	validateListen();
-		void	validateServerName();
-		void	validateErrorPage();
-		void	validateClienMaxBody();
-		void	validateRoot();
-		void	validateIndex();
-		void	validateAutoIndex();
-		void	validateMethods();
-		void	validateAlias();
-		void	validateReturns();
-		void	validateCgiExt():
-}
+	Validator(); // ctor
+   std::map<std::string, void(*)(std::vector<std::string>& )> funcMap;
+		void	(Validator::*_FunPTR[4])(std::vector<std::string>&);
+       /*♡♡♡♡♡♡♡♡♡♡♡FT_VALIDATE♡♡♡♡♡♡♡♡♡♡♡♡♡*/
+		static void	validateIp(std::vector<std::string>& prmtrs);
+//		void	validateCgiPath(std::vector<std::string> prmtrs);
+//		void	validateListen(std::vector<std::string> prmtrs);
+//		void	validateServerName(std::vector<std::string> prmtrs);
+//		void	validateErrorPage(std::vector<std::string> prmtrs);
+//		void	validateClienMaxBody(std::vector<std::string> prmtrs);
+//		void	validateRoot(std::vector<std::string> prmtrs);
+//		void	validateIndex(std::vector<std::string> prmtrs);
+//		void	validateAutoIndex(std::vector<std::string> prmtrs);
+//		void	validateMethods(std::vector<std::string> prmtrs);
+//		void	validateAlias(std::vector<std::string> prmtrs);
+//		void	validateReturns(std::vector<std::string> prmtrs);
+//		void	validateCgiExt(std::vector<std::string> prmtrs):
+       /*♡♡♡♡♡♡♡♡♡♡♡EXCPTION♡♡♡♡♡♡♡♡♡♡♡♡♡*/
+		class ToManyDothInIp : public std::exception 
+		{
+			public:
+				virtual const char* what() const throw();  // dichiarazione
+		};
+		class clientMaxBodyOutOfRange : public std::exception 
+		{
+			public:
+				virtual const char* what() const throw();  // dichiarazione
+		};
+		class indexMethods : public std::exception 
+		{
+			public:
+				virtual const char* what() const throw();  // dichiarazione
+		};
+		class ipOutOfRange: public std::exception 
+		{
+			public:
+				virtual const char* what() const throw();  // dichiarazione
+		};
+		class ipVectorSizeToHight : public std::exception 
+		{
+			public:
+				virtual const char* what() const throw();  // dichiarazione
+		};
+		class ipVectorSizeToLow : public std::exception 
+		{
+			public:
+				virtual const char* what() const throw();  // dichiarazione
+		};
+		class  ToManyDigitInIp : public std::exception 
+		{
+			public:
+				virtual const char* what() const throw();  // dichiarazione
+		};
+		
+		class  IpEmpty: public std::exception 
+		{
+			public:
+				virtual const char* what() const throw();  // dichiarazione
+		};
+
+		class  onlyDigitInIp: public std::exception 
+		{
+			public:
+				virtual const char* what() const throw();  // dichiarazione
+		};
+};
+
 struct	Node
 {
 	std::string name;
@@ -65,6 +115,7 @@ class ConfigProcessor
        /*♡♡♡♡♡♡♡♡♡♡♡DTOR♡♡♡♡♡♡♡♡♡♡♡♡♡*/
        virtual ~ConfigProcessor(); //Cannon
   private:
+	   struct Validator valval;
        ConfigProcessor();  //cannon
 	   const std::string	PathFile;
 	   std::string		Buffer;
@@ -81,7 +132,7 @@ class ConfigProcessor
 	   void ValidationPath( void ) const;
 		void	countBracket() const;
 		void	recursiveMap( void );
-		void	validationParameters( void ) const;
+		void	validationParameters( void );
        /*♡♡♡♡♡♡♡♡♡♡♡OPERATOR♡♡♡♡♡♡♡♡♡♡♡♡♡*/
 
 };

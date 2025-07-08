@@ -6,7 +6,7 @@
 /*   By: jfranco <jfranco@student.s19.be>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 19:28:53 by jfranco           #+#    #+#             */
-/*   Updated: 2025/07/05 19:28:54 by jfranco          ###   ########.fr       */
+/*   Updated: 2025/07/08 17:56:57 by jfranco          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,23 +90,30 @@ std::string ConfigProcessor::findRemplaceComment(std::string const& input, std::
     return result;                             
 }
 
-void	ConfigProcessor::validationParameters(const std::map<std::string, std::vector<std::string> >& check)const
+void	ConfigProcessor::validationParameters()
 {
-	std::map<std::string, std::vector<std::string> >::const_iterator it = check.begin();
-	while(it_ != check.end())
+	std::vector<Node>::iterator it_ = tree.begin();
+	while(it_ != tree.end())
 	{
-		std::string key = it->first;
-		std::vector<std::string> value = it->second;
-		if (key == info)
+		std::map<std::string, std::vector<std::string> >::iterator itPrmtrs = it_->prmtrs.begin();
+		while(itPrmtrs != it_->prmtrs.end())
 		{
-			try
+			std::map<std::string, void(*)(std::vector<std::string>&)>::iterator itFunc = this->valval.funcMap.find(itPrmtrs->first);
+			if (itFunc != this->valval.funcMap.end())	 
 			{
+				try
+				{
+					itFunc->second(itPrmtrs->second);
+				}
+				catch (...)
+				{
+					Logger::error( )<< "Catch error";
+				}
 			}
-			catch (...)
-			{
-			}
-		}
+			++itPrmtrs;
 
+		}
+		++it_;
 	}
 }
 
@@ -195,15 +202,22 @@ void	ConfigProcessor::StreamErrorFind(std::stringstream& ss) const
 	else
 		Logger::info() << "Stream OK!";
 }
-
+#include <iostream>
+#include <sys/stat.h>
 void	ConfigProcessor::ValidationPath() const
 {
 	const std::string exte = ".conf";
 	size_t	posDoth = PathFile.rfind(exte);
+	struct stat sb;
 	if (posDoth != std::string::npos)
 	{
-        if (posDoth == (PathFile.length() - exte.length()))
+        if (posDoth == (PathFile.length() - exte.length())){
 					Logger::info() << "Valid extension, try open file";
+					if (stat(PathFile.c_str(), &sb) == 0 && (sb.st_mode & S_IFDIR)){
+						Logger::error() << "the configuration must be a file";
+						exit(-1);
+					}
+		}
 		else
 			exit (-1);
 
@@ -251,16 +265,16 @@ void ConfigProcessor::tokenize( void )
 	if(!file ||file.eof())
 	{
 		// TODO:(e.g., log or throw an exception) ♡♡♡♡♡♡
-		std::cout << "Error stream" << std::endl;
+		Logger::error() << "Error stream";
 		return ;
 	}
-
 /* ♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡
 	// Use a stringstream to read the entire file content into memory ♡♡♡♡♡♡
  ♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡ */
 	std::stringstream ss;
 	StreamErrorFind(ss);
 	ss << file.rdbuf();
+	file.close();
 	this->Buffer = ss.str();
 /* ♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡
      * Remove all comments from the buffer:
@@ -279,6 +293,7 @@ void ConfigProcessor::tokenize( void )
 	StreamErrorFind(tokenStream);	
 	RicorsiveTree(tokenStream);
 	recursiveMap();
+	validationParameters();
 }
  
        /*♡♡♡♡♡♡♡♡♡♡♡OPERATOR♡♡♡♡♡♡♡♡♡♡♡♡♡*/
