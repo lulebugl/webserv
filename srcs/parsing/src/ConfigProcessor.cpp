@@ -89,8 +89,33 @@ std::string ConfigProcessor::findRemplaceComment(std::string const& input, std::
 	}
     return result;                             
 }
-
 typedef void (Validator::*ValidateFunction)(const std::vector<std::string>&);
+void	ConfigProcessor::heandelError(ValidateFunction fun, std::map<std::string, std::vector<std::string> >::iterator itPrmtrs, const std::string &name)
+{
+		try
+		{
+			Logger::info() << "Try validate: " << itPrmtrs->first << "in " << name;
+			(this->valval.*fun)(itPrmtrs->second);
+		}
+		catch (Validator::DontValidIp &e)
+		{
+			Logger::error() << e.what() <<  " " << itPrmtrs->first; ;
+			Logger::warning() << "Defalt ip set";
+			itPrmtrs->second[0] = "127.0.0.1";
+		}
+		catch (Validator::PortAccessDeniedException &e)
+		{
+			Logger::error() << e.what() <<  " " << itPrmtrs->first; ;
+			Logger::warning() << "Defalt port setting";
+			itPrmtrs->second[0] = "8080";
+		}
+		catch (std::exception& e)
+		{
+			Logger::error() << e.what() <<  " " << itPrmtrs->first; ;
+			exit(1);
+		}
+}
+
 void	ConfigProcessor::validationParameters()
 {
 	std::vector<Node>::iterator it_ = tree.begin();
@@ -108,31 +133,27 @@ void	ConfigProcessor::validationParameters()
 			if (itFunc != this->valval.funcMap.end())	 
 			{
 				ValidateFunction func =itFunc->second;
-				try
-				{
-					Logger::info() << "Try validate: " << itPrmtrs->first;
-					(this->valval.*func)(itPrmtrs->second);
-				}
-				catch (Validator::DontValidIp &e)
-				{
-					Logger::error() << e.what() <<  " " << itPrmtrs->first; ;
-					Logger::warning() << "Defalt ip set";
-					itPrmtrs->second[0] = "127.0.0.1";
-				}
-				catch (Validator::PortAccessDeniedException &e)
-				{
-					Logger::error() << e.what() <<  " " << itPrmtrs->first; ;
-					Logger::warning() << "Defalt port setting";
-					itPrmtrs->second[0] = "8080";
-				}
-				catch (std::exception& e)
-				{
-					Logger::error() << e.what() <<  " " << itPrmtrs->first; ;
-					exit(1);
-				}
+				heandelError(func, itPrmtrs, it_->name);
 			}
 			++itPrmtrs;
 
+		}
+		std::vector<Node>::iterator itChild = it_->children.begin();
+		while (itChild != it_->children.end())
+		{
+			std::map<std::string, std::vector<std::string> >::iterator itPrmtrs = itChild->prmtrs.begin();
+			while(itPrmtrs != itChild->prmtrs.end())
+			{
+				std::map<std::string, ValidateFunction>::iterator itFunc = this->valval.funcMap.find(itPrmtrs->first);
+				if (itFunc != this->valval.funcMap.end())	 
+				{
+					ValidateFunction func =itFunc->second;
+					heandelError(func, itPrmtrs, itChild->name);
+				}
+				++itPrmtrs;
+
+			}
+			itChild++;
 		}
 		++it_;
 	}

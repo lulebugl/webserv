@@ -109,6 +109,7 @@ struct	Node
 	void	printTree() const ;
 };
 
+typedef void (Validator::*ValidateFunction)(const std::vector<std::string>&);
  
 class ConfigProcessor
 {
@@ -149,6 +150,7 @@ class ConfigProcessor
 		void	countBracket() const;
 		void	recursiveMap( void );
 		void	validationParameters( void );
+		void	heandelError(ValidateFunction fun, std::map<std::string, std::vector<std::string> >::iterator itPrmtrs, const std::string &name);
        /*♡♡♡♡♡♡♡♡♡♡♡OPERATOR♡♡♡♡♡♡♡♡♡♡♡♡♡*/
 
 };
