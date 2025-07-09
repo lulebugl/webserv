@@ -6,7 +6,7 @@
 /*   By: llebugle <llebugle@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/09 19:02:07 by llebugle          #+#    #+#             */
-/*   Updated: 2025/07/09 14:29:53 by jfranco          ###   ########.fr       */
+/*   Updated: 2025/07/09 19:18:53 by jfranco          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,7 @@ void Logger::log(LogLevel level, const std::string& message) {
                 break;
             }
             case LOG_LEVEL_INFO: {
-                std::cout << GREEN;
+                std::cout << BLUE;
                 break;
             }
             case LOG_LEVEL_VALIDE: {
