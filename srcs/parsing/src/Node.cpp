@@ -1,5 +1,6 @@
 
 #include "../include/ConfigProcessor.hpp"
+       /*♡♡♡♡♡♡♡♡♡♡♡FORMATTER_PARAMATERS♡♡♡♡♡♡♡♡♡♡♡♡♡*/
 void Node::clearMap( void )
 {
 	std::map<std::string, std::vector<std::string> >::iterator it = prmtrs.begin();
@@ -68,6 +69,7 @@ void Node::pushArgInMap( void )
 	addDefualtParm();
 }
 
+       /*♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡*/
 void	Node::printMap( void ) const
 {
 	Logger::info() << "Istruzzioni all'interno del nodo: " << name;

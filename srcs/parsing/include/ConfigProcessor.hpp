@@ -20,9 +20,12 @@
 struct Validator
 {
     typedef void (Validator::*ValidateFunction)(const std::vector<std::string>&);
+
+       /*♡♡♡♡♡♡♡♡♡♡♡CTOR♡♡♡♡♡♡♡♡♡♡♡♡♡*/
 	Validator(); // ctor
    std::map<std::string, ValidateFunction> funcMap;
 		void	(Validator::*_FunPTR[12])(std::vector<std::string>&);
+
        /*♡♡♡♡♡♡♡♡♡♡♡FT_VALIDATE♡♡♡♡♡♡♡♡♡♡♡♡♡*/
 		void	validateIp(const std::vector<std::string>& prmtrs);
 		void	validateCgiPath(const std::vector<std::string>& prmtrs);
@@ -35,6 +38,7 @@ struct Validator
 		void	validateAutoIndex(const std::vector<std::string>& prmtrs);
 		void	validateMethods(const std::vector<std::string>& prmtrs);
 		void	validateCgiExt(const std::vector<std::string>& prmtrs);
+
        /*♡♡♡♡♡♡♡♡♡♡♡EXCPTION♡♡♡♡♡♡♡♡♡♡♡♡♡*/
 		class PortAccessDeniedException : public std::exception 
 		{
