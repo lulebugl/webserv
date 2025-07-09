@@ -11,26 +11,38 @@
 #include <fstream>   // ← se usi std::ifstream
 #include <map>   // ← se usi std::map
 #include <cstdlib> // necessario per exit()
+//
+
+//typedef void (Validator::*)(std::vector<std::string>&)
+//
+#define MAX_BODY_SIZE 524288000
+
 struct Validator
 {
+    typedef void (Validator::*ValidateFunction)(const std::vector<std::string>&);
 	Validator(); // ctor
-   std::map<std::string, void(*)(std::vector<std::string>& )> funcMap;
+   std::map<std::string, ValidateFunction> funcMap;
 		void	(Validator::*_FunPTR[12])(std::vector<std::string>&);
        /*♡♡♡♡♡♡♡♡♡♡♡FT_VALIDATE♡♡♡♡♡♡♡♡♡♡♡♡♡*/
-		static void	validateIp(std::vector<std::string>& prmtrs);
+		void	validateIp(const std::vector<std::string>& prmtrs);
 //		void	validateCgiPath(std::vector<std::string> prmtrs);
 //		void	validateListen(std::vector<std::string> prmtrs);
-//		void	validateServerName(std::vector<std::string> prmtrs);
+		void	validateServerName(const std::vector<std::string>& prmtrs);
 //		void	validateErrorPage(std::vector<std::string> prmtrs);
-//		void	validateClienMaxBody(std::vector<std::string> prmtrs);
+		void	validateClienMaxBody(const std::vector<std::string>& prmtrs);
 //		void	validateRoot(std::vector<std::string> prmtrs);
-//		void	validateIndex(std::vector<std::string> prmtrs);
-//		void	validateAutoIndex(std::vector<std::string> prmtrs);
-//		void	validateMethods(std::vector<std::string> prmtrs);
+		void	validateAutoIndex(const std::vector<std::string>& prmtrs);
+//		void	validateIndex(const std::vector<std::string> prmtrs);
+		void	validateMethods(const std::vector<std::string>& prmtrs);
 //		void	validateAlias(std::vector<std::string> prmtrs);
 //		void	validateReturns(std::vector<std::string> prmtrs);
 //		void	validateCgiExt(std::vector<std::string> prmtrs):
        /*♡♡♡♡♡♡♡♡♡♡♡EXCPTION♡♡♡♡♡♡♡♡♡♡♡♡♡*/
+		class unknownMethods : public std::exception 
+		{
+			public:
+				virtual const char* what() const throw();  // dichiarazione
+		};
 		class ToManyDoth : public std::exception 
 		{
 			public:
@@ -46,7 +58,7 @@ struct Validator
 			public:
 				virtual const char* what() const throw();  // dichiarazione
 		};
-		class OutOfRange: public std::exception 
+		class InvalidCharEx: public std::exception 
 		{
 			public:
 				virtual const char* what() const throw();  // dichiarazione
@@ -86,6 +98,7 @@ struct	Node
 	std::vector<std::string> array;
 	std::vector<Node> children;
 	std::map<std::string, std::vector<std::string> > prmtrs; 
+	void	clearMap( void );
 	void	pushArgInMap( void );
 	void	printMap(void)const;
 

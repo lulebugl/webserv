@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Logger.cpp                                         :+:      :+:    :+:   */
+/*   logger.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: llebugle <llebugle@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/09 19:02:07 by llebugle          #+#    #+#             */
-/*   Updated: 2025/05/09 19:02:07 by llebugle         ###   ########.fr       */
+/*   Updated: 2025/07/09 14:29:53 by jfranco          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@ const std::string Logger::getLevelName(LogLevel level) {
         case LOG_LEVEL_WARNING: return "WARNING";
         case LOG_LEVEL_ERROR: return "ERROR";
         case LOG_LEVEL_CRITICAL: return "CRITICAL";
+        case LOG_LEVEL_VALIDE: return "OK";
         case LOG_LEVEL_NONE: return "NONE";
         default: return "UNKNOWN";
     }
@@ -88,6 +89,10 @@ void Logger::log(LogLevel level, const std::string& message) {
                 std::cout << GREEN;
                 break;
             }
+            case LOG_LEVEL_VALIDE: {
+                std::cout << GREEN;
+                break;
+            }
             case LOG_LEVEL_WARNING: {
                 std::cout << YELLOW;
                 break;
@@ -123,6 +128,10 @@ LogStream Logger::warning() {
 
 LogStream Logger::error() {
     return LogStream(LOG_LEVEL_ERROR);
+}
+
+LogStream Logger::valide() {
+    return LogStream(LOG_LEVEL_VALIDE);
 }
 
 LogStream Logger::critical() {

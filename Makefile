@@ -6,7 +6,7 @@
 #    By: llebugle <llebugle@student.s19.be>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/06/25 18:26:27 by llebugle          #+#    #+#              #
-#    Updated: 2025/06/27 21:25:11 by llebugle         ###   ########.fr        #
+#    Updated: 2025/07/09 12:14:26 by jfranco          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -66,4 +66,7 @@ crun: cbuild
 
 ctest: cbuild-test
 	@cd build && ./webserv_test
+parsing:
+	$(MAKE) -C srcs/parsing
+
 .PHONY: cmake-build cmake-clean cmake-run

@@ -6,7 +6,7 @@
 /*   By: llebugle <llebugle@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/09 19:02:07 by llebugle          #+#    #+#             */
-/*   Updated: 2025/05/09 19:02:07 by llebugle         ###   ########.fr       */
+/*   Updated: 2025/07/09 14:30:09 by jfranco          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,8 @@ enum LogLevel {
     LOG_LEVEL_WARNING = 2,   // Warning messages
     LOG_LEVEL_ERROR = 3,     // Error messages
     LOG_LEVEL_CRITICAL = 4,  // Error messages
-    LOG_LEVEL_NONE = 5       // No logging at all
+    LOG_LEVEL_NONE = 6,       // No logging at all
+    LOG_LEVEL_VALIDE = 5  // Validate ellement
 };
 
 class Logger {
@@ -47,6 +48,7 @@ class Logger {
     static LogStream warning();
     static LogStream error();
     static LogStream critical();
+    static LogStream valide();
 
     static void debug(const std::string& message);
     static void info(const std::string& message);

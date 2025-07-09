@@ -6,7 +6,7 @@
 /*   By: jfranco <jfranco@student.s19.be>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 19:28:53 by jfranco           #+#    #+#             */
-/*   Updated: 2025/07/08 17:56:57 by jfranco          ###   ########.fr       */
+/*   Updated: 2025/07/09 15:48:18 by jfranco          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ ConfigProcessor::ConfigProcessor()
 ConfigProcessor::ConfigProcessor(ConfigProcessor const & src)
 {
     //std::cout << "Copy constructor called" << std::endl;
-    //*this = src;
+    *this = src;
 }
 
        /*♡♡♡♡♡♡♡♡♡♡♡GETTER♡♡♡♡♡♡♡♡♡♡♡♡♡*/
@@ -90,6 +90,7 @@ std::string ConfigProcessor::findRemplaceComment(std::string const& input, std::
     return result;                             
 }
 
+typedef void (Validator::*ValidateFunction)(const std::vector<std::string>&);
 void	ConfigProcessor::validationParameters()
 {
 	std::vector<Node>::iterator it_ = tree.begin();
@@ -98,21 +99,25 @@ void	ConfigProcessor::validationParameters()
 		std::map<std::string, std::vector<std::string> >::iterator itPrmtrs = it_->prmtrs.begin();
 		while(itPrmtrs != it_->prmtrs.end())
 		{
-			std::map<std::string, void(*)(std::vector<std::string>&)>::iterator itFunc = this->valval.funcMap.find(itPrmtrs->first);
+			std::map<std::string, ValidateFunction>::iterator itFunc = this->valval.funcMap.find(itPrmtrs->first);
 			if (itFunc != this->valval.funcMap.end())	 
 			{
+				ValidateFunction func =itFunc->second;
 				try
 				{
-					itFunc->second(itPrmtrs->second);
+					Logger::info() << "Try validate: " << itPrmtrs->first;
+					(this->valval.*func)(itPrmtrs->second);
 				}
 				catch (Validator::DontValidIp &e)
 				{
+					Logger::error() << e.what() <<  " " << itPrmtrs->first; ;
 					Logger::warning() << "Defalt ip set";
 					itPrmtrs->second[0] = "127.0.0.1";
 				}
-				catch (...)
+				catch (std::exception& e)
 				{
-					Logger::error( )<< "Catch error";
+					Logger::error() << e.what() <<  " " << itPrmtrs->first; ;
+					exit(1);
 				}
 			}
 			++itPrmtrs;
@@ -127,7 +132,7 @@ void	ConfigProcessor::RicorsiveTree(std::stringstream& sstoken, bool flags)
 	std::string token;
 	char c;
     if (!(sstoken >> token))
-        return;
+		return;
 	sstoken >> std::ws;  // salta spazi bianchi (spazi, tab, newline)
 	c = sstoken.peek();
 	if (token == "server" && c == '{' && flags == true)

@@ -1,5 +1,19 @@
 
 #include "../include/ConfigProcessor.hpp"
+void Node::clearMap( void )
+{
+	std::map<std::string, std::vector<std::string> >::iterator it = prmtrs.begin();
+
+for (; it != prmtrs.end(); ++it)
+	{
+        std::vector<std::string>& vec = it->second;
+        if (!vec.empty()) 
+		{
+            std::string& sub = vec.back();
+            sub.erase(sub.find_last_not_of(";") + 1);
+		}
+	}
+}
 void Node::pushArgInMap( void )
 {
 	std::vector<std::string>::iterator it = array.begin();
@@ -27,6 +41,7 @@ void Node::pushArgInMap( void )
 			prmtrs.insert(std::make_pair(key, std::vector<std::string>(start, end + 1)));
 		key.clear();
     }
+	clearMap();
 }
 
 void	Node::printMap( void ) const
@@ -54,6 +69,7 @@ void Node::printTree( void ) const
 {
     std::cout << name << "\n";
 	std::vector<std::string>::const_iterator it = array.begin();
+	(void)it;
     for (size_t i = 0; i < children.size(); ++i) {
         bool isLast = (i == children.size() - 1);
         children[i].printSubtree("", isLast);
@@ -66,6 +82,7 @@ void Node::printSubtree(const std::string& prefix, bool isLast) const {
     std::cout << name << "\n";
 	std::vector<std::string>::const_iterator it = array.begin();
 
+	(void)it;
 //	while(it != array.end())
 //	{
 //		std::cout << (isLast ? "   └── " : "   ├── ");
