@@ -6,7 +6,7 @@
 /*   By: jfranco <jfranco@student.s19.be>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/08 13:42:00 by jfranco           #+#    #+#             */
-/*   Updated: 2025/07/09 16:06:17 by jfranco          ###   ########.fr       */
+/*   Updated: 2025/07/09 18:38:39 by jfranco          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,86 @@ Validator::Validator()
 	this->funcMap.insert(std::make_pair("client_max_body_size", &Validator::validateClienMaxBody));
 	this->funcMap.insert(std::make_pair("autoindex", &Validator::validateAutoIndex));
 	this->funcMap.insert(std::make_pair("allow_methods", &Validator::validateMethods));
+	this->funcMap.insert(std::make_pair("listen", &Validator::validateListen));
+	this->funcMap.insert(std::make_pair("root", &Validator::validateRoot));
+	this->funcMap.insert(std::make_pair("alias", &Validator::validateRoot));
+	this->funcMap.insert(std::make_pair("cgi_path", &Validator::validateCgiPath));
+	this->funcMap.insert(std::make_pair("cgi_ext", &Validator::validateCgiExt));
 	return ;
+}
+void	Validator::validateCgiExt(const std::vector<std::string>& prmtrs)
+{
+	size_t pos = 0;
+	for (size_t i = 0; i < prmtrs.size(); i++)
+	{
+		if(prmtrs[i].size() < 1)
+		{
+			throw Empty();
+		}
+		pos = prmtrs[i].find(".");
+		if (pos != std::string::npos)
+		{
+			if (pos != 0)
+				throw InvalidCharEx();
+		}
+
+	}
+	Logger::valide() << "cgi ext";
+
+}
+void	Validator::validateCgiPath(const std::vector<std::string>& prmtrs)
+{
+	for (size_t i = 0; i < prmtrs.size(); i++)
+	{
+		if (prmtrs[i].size() < 1)
+		{
+			throw Empty();
+		}
+		validatePath(prmtrs[i]);
+	}
+	Logger::valide() << "cgi path";
+
+}
+void	Validator::validateRoot(const std::vector<std::string>& prmtrs)
+{
+	if (prmtrs.size() > 1)
+		throw VectorSizeToHight();
+	if (prmtrs.size() < 1)
+		throw VectorSizeToLow();
+	if (prmtrs[0].size() < 1)
+		throw Empty();
+	validatePath(prmtrs[0]);
+	Logger::valide() << "root";
+}
+void	Validator::validatePath(const std::string& prmtrs)
+{
+	size_t pos = 0;
+	pos = prmtrs.find("//");
+	if (pos != std::string::npos)
+		throw OutOfRange();
+}
+void	Validator::validateListen( const std::vector<std::string>& prmtrs )
+{
+	if (prmtrs.size() > 1)
+		throw VectorSizeToHight();
+	if (prmtrs.size() < 1)
+		throw VectorSizeToLow();
+	if (prmtrs[0].size() < 1)
+		throw Empty();
+	for (size_t i = 0; prmtrs[0][i]; i++){
+		if (!std::isdigit(prmtrs[0][i]))
+		{
+			throw InvalidCharEx();
+		}
+	}
+	std::stringstream ss(prmtrs[0]);
+	long long nbr;
+	ss >> nbr;
+	if (nbr >  65535 || nbr < 0)
+		throw OutOfRange();
+	if (nbr < 1023 && nbr > 0)
+		throw PortAccessDeniedException();
+	Logger::valide() << "listen";
 }
 
 void	Validator::validateAutoIndex(const std::vector<std::string>& prmtrs)
@@ -32,8 +111,10 @@ void	Validator::validateAutoIndex(const std::vector<std::string>& prmtrs)
 		throw VectorSizeToLow();
 	if (prmtrs[0].size() < 1)
 		throw Empty();
-	if (prmtrs[0] != "on" || prmtrs[0] != "off")
+	if (prmtrs[0] != "on" &&  prmtrs[0] != "off")
+	{
 		throw unknownMethods();
+	}
 	Logger::valide() << "autoIndex";
 }
 
@@ -68,7 +149,7 @@ void	Validator::validateClienMaxBody(const std::vector<std::string>& prmtrs)
 	long long nbr;
 	ss >> nbr;
 	if(nbr > MAX_BODY_SIZE)
-		throw clientMaxBodyOutOfRange();
+		throw OutOfRange();
 	Logger::valide() << "Client_Max_Body";
 }
 
@@ -149,9 +230,9 @@ const char* Validator::ToManyDoth::what() const throw()
     return "Too many dots in IP address";
 }
 
-const char* Validator::clientMaxBodyOutOfRange::what() const throw()
+const char* Validator::OutOfRange::what() const throw()
 {
-    return "Client max body size out of range";
+    return "out of range: ";
 }
 
 const char* Validator::InvalidCharEx::what() const throw()
@@ -171,7 +252,7 @@ const char* Validator::VectorSizeToLow::what() const throw()
 
 const char* Validator::DontValidIp::what() const throw()
 {
-    return "IP address is non valid";
+    return "non valid: ";
 }
 
 const char* Validator::Empty::what() const throw()
@@ -182,5 +263,9 @@ const char* Validator::Empty::what() const throw()
 const char* Validator::onlyDigit::what() const throw()
 {
     return "IP contains only digits";
+}
+const char* Validator::PortAccessDeniedException::what() const throw()
+{
+    return "Need permsions sudo for access: ";
 }
 

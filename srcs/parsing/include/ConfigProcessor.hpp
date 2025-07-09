@@ -25,19 +25,22 @@ struct Validator
 		void	(Validator::*_FunPTR[12])(std::vector<std::string>&);
        /*♡♡♡♡♡♡♡♡♡♡♡FT_VALIDATE♡♡♡♡♡♡♡♡♡♡♡♡♡*/
 		void	validateIp(const std::vector<std::string>& prmtrs);
-//		void	validateCgiPath(std::vector<std::string> prmtrs);
-//		void	validateListen(std::vector<std::string> prmtrs);
+		void	validateCgiPath(const std::vector<std::string>& prmtrs);
+		void	validateListen(const std::vector<std::string>& prmtrs);
 		void	validateServerName(const std::vector<std::string>& prmtrs);
 //		void	validateErrorPage(std::vector<std::string> prmtrs);
 		void	validateClienMaxBody(const std::vector<std::string>& prmtrs);
-//		void	validateRoot(std::vector<std::string> prmtrs);
+		void	validatePath(const std::string& prmtrs);
+		void	validateRoot(const std::vector<std::string>& prmtrs);
 		void	validateAutoIndex(const std::vector<std::string>& prmtrs);
-//		void	validateIndex(const std::vector<std::string> prmtrs);
 		void	validateMethods(const std::vector<std::string>& prmtrs);
-//		void	validateAlias(std::vector<std::string> prmtrs);
-//		void	validateReturns(std::vector<std::string> prmtrs);
-//		void	validateCgiExt(std::vector<std::string> prmtrs):
+		void	validateCgiExt(const std::vector<std::string>& prmtrs);
        /*♡♡♡♡♡♡♡♡♡♡♡EXCPTION♡♡♡♡♡♡♡♡♡♡♡♡♡*/
+		class PortAccessDeniedException : public std::exception 
+		{
+			public:
+				virtual const char* what() const throw();  // dichiarazione
+		};
 		class unknownMethods : public std::exception 
 		{
 			public:
@@ -48,12 +51,7 @@ struct Validator
 			public:
 				virtual const char* what() const throw();  // dichiarazione
 		};
-		class clientMaxBodyOutOfRange : public std::exception 
-		{
-			public:
-				virtual const char* what() const throw();  // dichiarazione
-		};
-		class indexMethods : public std::exception 
+		class OutOfRange : public std::exception 
 		{
 			public:
 				virtual const char* what() const throw();  // dichiarazione
@@ -101,6 +99,7 @@ struct	Node
 	void	clearMap( void );
 	void	pushArgInMap( void );
 	void	printMap(void)const;
+	void	addDefualtParm(void);
 
 	void	printSubtree(const std::string &prefix, bool isLast) const;
 	void	printTree() const ;

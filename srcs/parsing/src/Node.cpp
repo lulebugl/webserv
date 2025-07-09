@@ -14,6 +14,29 @@ for (; it != prmtrs.end(); ++it)
 		}
 	}
 }
+
+void Node::addDefualtParm( void )
+{
+	if (this->name == "server")
+	{
+		std::vector<std::string> vec;
+		vec.push_back("1048576");
+		prmtrs.insert(std::make_pair("client_max_body_size", vec));
+		std::vector<std::string> vecIp;
+		vecIp.push_back("127.0.0.1");
+		prmtrs.insert(std::make_pair("host", vecIp));
+
+	}
+	std::vector<std::string> vecAuto;
+	vecAuto.push_back("off");
+	prmtrs.insert(std::make_pair("autoindex", vecAuto));
+	std::vector<std::string> vecMetho;
+	vecMetho.push_back("GET");
+	prmtrs.insert(std::make_pair("allow_methods", vecMetho));
+	std::vector<std::string> vecIndex;
+	vecIndex.push_back("index.html");
+	prmtrs.insert(std::make_pair("index", vecIndex));
+}
 void Node::pushArgInMap( void )
 {
 	std::vector<std::string>::iterator it = array.begin();
@@ -42,6 +65,7 @@ void Node::pushArgInMap( void )
 		key.clear();
     }
 	clearMap();
+	addDefualtParm();
 }
 
 void	Node::printMap( void ) const

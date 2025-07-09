@@ -6,7 +6,7 @@
 /*   By: jfranco <jfranco@student.s19.be>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 19:28:53 by jfranco           #+#    #+#             */
-/*   Updated: 2025/07/09 15:48:18 by jfranco          ###   ########.fr       */
+/*   Updated: 2025/07/09 19:10:52 by jfranco          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,6 +97,11 @@ void	ConfigProcessor::validationParameters()
 	while(it_ != tree.end())
 	{
 		std::map<std::string, std::vector<std::string> >::iterator itPrmtrs = it_->prmtrs.begin();
+		if (it_->prmtrs.count("listen")  < 1)
+		{
+			Logger::error() << "listening port, is mandatory parameter";
+			exit(1);
+		}
 		while(itPrmtrs != it_->prmtrs.end())
 		{
 			std::map<std::string, ValidateFunction>::iterator itFunc = this->valval.funcMap.find(itPrmtrs->first);
@@ -113,6 +118,12 @@ void	ConfigProcessor::validationParameters()
 					Logger::error() << e.what() <<  " " << itPrmtrs->first; ;
 					Logger::warning() << "Defalt ip set";
 					itPrmtrs->second[0] = "127.0.0.1";
+				}
+				catch (Validator::PortAccessDeniedException &e)
+				{
+					Logger::error() << e.what() <<  " " << itPrmtrs->first; ;
+					Logger::warning() << "Defalt port setting";
+					itPrmtrs->second[0] = "8080";
 				}
 				catch (std::exception& e)
 				{
