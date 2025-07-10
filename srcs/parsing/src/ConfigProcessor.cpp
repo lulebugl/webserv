@@ -116,7 +116,19 @@ void	ConfigProcessor::heandelError(ValidateFunction fun, std::map<std::string, s
 		}
 }
 
-void	ConfigProcessor::validationParameters()
+void	ConfigProcessor::prmtrsNoAllowedHere( void )
+{
+	if (name != "cgi-bin")
+		std::vector<std::string> vecNoAll = {"list", "host", "server_name"};
+	else
+		std::vector<std::string> vecNoAll = {"list", "host", "server_name"};
+	for (size_t i = 0; i < vecNoAll.size(); i++)
+	{
+		std::map<std::string, std::vector<std::string> >::iterator itPrmtrs = this->prmtrs.find(vecNoAll[i]);
+	}
+
+}
+void	ConfigProcessor::validationParameters( void )
 {
 	std::vector<Node>::iterator it_ = tree.begin();
 	while(it_ != tree.end())
