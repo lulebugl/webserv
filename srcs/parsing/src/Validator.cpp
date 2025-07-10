@@ -6,7 +6,7 @@
 /*   By: jfranco <jfranco@student.s19.be>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/08 13:42:00 by jfranco           #+#    #+#             */
-/*   Updated: 2025/07/09 19:59:23 by jfranco          ###   ########.fr       */
+/*   Updated: 2025/07/10 16:49:50 by jfranco          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ void	Validator::validateCgiExt(const std::vector<std::string>& prmtrs)
 		}
 
 	}
-	Logger::valide() << "cgi ext♡♡";
+	Logger::valide() << "cgi ext";
 
 }
 void	Validator::validateCgiPath(const std::vector<std::string>& prmtrs)
@@ -60,7 +60,7 @@ void	Validator::validateCgiPath(const std::vector<std::string>& prmtrs)
 		}
 		validatePath(prmtrs[i]);
 	}
-	Logger::valide() << "cgi path♡♡";
+	Logger::valide() << "cgi path";
 
 }
 void	Validator::validateRoot(const std::vector<std::string>& prmtrs)
@@ -72,7 +72,7 @@ void	Validator::validateRoot(const std::vector<std::string>& prmtrs)
 	if (prmtrs[0].size() < 1)
 		throw Empty();
 	validatePath(prmtrs[0]);
-	Logger::valide() << "root♡♡";
+	Logger::valide() << "root";
 }
 void	Validator::validatePath(const std::string& prmtrs)
 {
@@ -102,7 +102,7 @@ void	Validator::validateListen( const std::vector<std::string>& prmtrs )
 		throw OutOfRange();
 	if (nbr < 1023 && nbr > 0)
 		throw PortAccessDeniedException();
-	Logger::valide() << "listen♡♡";
+	Logger::valide() << "listen";
 }
 
 void	Validator::validateAutoIndex(const std::vector<std::string>& prmtrs)
@@ -117,7 +117,7 @@ void	Validator::validateAutoIndex(const std::vector<std::string>& prmtrs)
 	{
 		throw unknownMethods();
 	}
-	Logger::valide() << "autoIndex♡♡";
+	Logger::valide() << "autoIndex";
 }
 
 void	Validator::validateMethods(const std::vector<std::string>& prmtrs)
@@ -131,7 +131,7 @@ void	Validator::validateMethods(const std::vector<std::string>& prmtrs)
 		if (prmtrs[i] != "GET" && prmtrs[i] != "POST" && prmtrs[i] != "DELETE" )
 			throw unknownMethods();
 	}
-	Logger::valide() << "allow_methods♡♡";
+	Logger::valide() << "allow_methods";
 }
 void	Validator::validateClienMaxBody(const std::vector<std::string>& prmtrs)
 {
@@ -152,7 +152,7 @@ void	Validator::validateClienMaxBody(const std::vector<std::string>& prmtrs)
 	ss >> nbr;
 	if(nbr > MAX_BODY_SIZE)
 		throw OutOfRange();
-	Logger::valide() << "Client_Max_Body♡♡";
+	Logger::valide() << "Client_Max_Body";
 }
 
 void	Validator::validateIp(const std::vector<std::string>& prmtrs )
@@ -189,7 +189,7 @@ void	Validator::validateIp(const std::vector<std::string>& prmtrs )
         if (std::atoi(temp.c_str()) > 255)
 				throw DontValidIp();
     }
-	Logger::valide() << "host♡♡";
+	Logger::valide() << "host";
 }
 
 static	bool InvalidChar(char c)
@@ -220,7 +220,7 @@ void	Validator::validateServerName(const std::vector<std::string>& prmtrs)
 		}
 
 	}
-	Logger::valide() << "Server_name♡♡";
+	Logger::valide() << "Server_name";
 }
        /*♡♡♡♡♡♡♡♡♡♡♡♡OVERRIDE_EXEPTION♡♡♡♡♡♡♡♡♡♡♡*/
 

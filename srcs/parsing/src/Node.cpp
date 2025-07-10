@@ -26,6 +26,9 @@ void Node::addDefualtParm( void )
 		std::vector<std::string> vecIp;
 		vecIp.push_back("127.0.0.1");
 		prmtrs.insert(std::make_pair("host", vecIp));
+		/*std::vector<std::string> vecName;
+		vecName.push_back("None");
+		prmtrs.insert(std::make_pair("server_name", vecName));*/
 
 	}
 	if (this->name != "cgi-bin")

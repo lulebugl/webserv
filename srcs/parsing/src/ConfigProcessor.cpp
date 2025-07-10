@@ -6,7 +6,7 @@
 /*   By: jfranco <jfranco@student.s19.be>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 19:28:53 by jfranco           #+#    #+#             */
-/*   Updated: 2025/07/10 15:54:41 by jfranco          ###   ########.fr       */
+/*   Updated: 2025/07/10 19:20:10 by jfranco          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,7 @@ void	ConfigProcessor::heandelError(ValidateFunction fun, std::map<std::string, s
 {
 		try
 		{
-			Logger::info() << "Try validate: " << itPrmtrs->first << "in " << name;
+			Logger::info() << "Try validate: " << itPrmtrs->first << " in " << name;
 			(this->valval.*fun)(itPrmtrs->second);
 		}
 		catch (Validator::DontValidIp &e)
@@ -168,15 +168,89 @@ void	ConfigProcessor::verifyInvalidParamsInContext(const std::string& name, cons
 		std::map<std::string, std::vector<std::string> >::const_iterator itPrmtrs = it.prmtrs.find(vecNoAll[i]);
 		if (itPrmtrs != it.prmtrs.end())
 		{
-			Logger::error() << "prmtrs non alloewd here:" << name << " " << itPrmtrs->first;
+			Logger::error() << "prmtrs non alloewd here: " << name << " " << itPrmtrs->first;
 			exit(1);
 		}
 	}
 	vecNoAll.clear();
 }
+
+void	ConfigProcessor::validateCgiBin( void ) const
+{
+	size_t count = 0;
+	std::vector<Node>::const_iterator it_ = tree.begin();
+	while(it_ != tree.end())
+	{
+		count = 0;
+		for (size_t i = 0; i < it_->children.size(); ++i)
+		{
+			if (it_->children[i].name == "cgi-bin")
+				count++;
+		}
+		if ( count < 1 )
+		{
+			Logger::error() << "Cgi-bin, is mandatory parameter";
+			exit(1);
+		}
+		++it_;
+	}
+}
+
+void	ConfigProcessor::heredityClientMaxBody( void )
+{
+	std::vector<Node>::iterator it_ = tree.begin();
+	while(it_ != tree.end())
+	{
+		std::map<std::string, std::vector<std::string> >::const_iterator param = it_->prmtrs.find("client_max_body_size");
+		for (size_t i = 0; i < it_->children.size(); ++i)
+		{
+
+			if (param != it_->prmtrs.end() && it_->children[i].name != "cgi-bin")
+			{
+			    it_->children[i].prmtrs.insert(*param);
+			}
+
+		}
+		++it_;
+	}
+
+}
+
+void	ConfigProcessor::validateDifferentPortServer( void ) const
+{
+	std::vector<Node>::const_iterator it_ = tree.begin();
+	while(it_ != tree.end())
+	{
+		std::map<std::string, std::vector<std::string> >::const_iterator listen = it_->prmtrs.find("listen");
+		if (listen != it_->prmtrs.end())
+		{
+			size_t i = 0;
+			while (i < tree.size())
+			{
+				size_t idx = std::distance(tree.begin(), it_);
+				if ( idx == i)
+					break ;
+				std::map<std::string, std::vector<std::string> >::const_iterator compare = tree[i].prmtrs.find("listen");
+				if (compare != tree[i].prmtrs.end())
+				{
+					if (compare->second[0] == listen->second[0])
+					{
+						Logger::error() << "Servers must have different listening to each other the port is: " << compare->second[0];
+						exit(1);
+					}
+				}
+				i++;
+			}
+		}
+		++it_;
+	}
+}
+
 void	ConfigProcessor::validationParameters( void )
 {
+	validateCgiBin();
 	validateForbiddenParameters();
+	heredityClientMaxBody();
 	std::vector<Node>::iterator it_ = tree.begin();
 	while(it_ != tree.end())
 	{
@@ -216,6 +290,9 @@ void	ConfigProcessor::validationParameters( void )
 		}
 		++it_;
 	}
+	validateDifferentPortServer();
+	//TODO: Validare che tutti i server abbiano un listen diverso OK! aggiungere giusto il controllo se é empty
+	//TODO: Ovveride client_max_body_size
 }
 
 void	ConfigProcessor::RicorsiveTree(std::stringstream& sstoken, bool flags)

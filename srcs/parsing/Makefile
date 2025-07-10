@@ -55,7 +55,7 @@ run: all
 ifeq ($(MODE), valgrind)
 	valgrind ./$(NAME)
 else ifeq ($(MODE), normal)
-	./$(NAME)
+	./$(NAME) ../../config/default.conf
 else ifeq ($(MODE), gdb)
 	gdb ./$(NAME)
 endif 
