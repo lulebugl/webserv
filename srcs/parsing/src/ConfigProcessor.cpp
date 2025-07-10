@@ -6,7 +6,7 @@
 /*   By: jfranco <jfranco@student.s19.be>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 19:28:53 by jfranco           #+#    #+#             */
-/*   Updated: 2025/07/09 19:10:52 by jfranco          ###   ########.fr       */
+/*   Updated: 2025/07/10 15:54:41 by jfranco          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,20 +116,67 @@ void	ConfigProcessor::heandelError(ValidateFunction fun, std::map<std::string, s
 		}
 }
 
-void	ConfigProcessor::prmtrsNoAllowedHere( void )
+void	ConfigProcessor::validateForbiddenParameters( void ) const
 {
-	if (name != "cgi-bin")
-		std::vector<std::string> vecNoAll = {"list", "host", "server_name"};
-	else
-		std::vector<std::string> vecNoAll = {"list", "host", "server_name"};
-	for (size_t i = 0; i < vecNoAll.size(); i++)
+	std::vector<Node>::const_iterator it_ = tree.begin();
+	while(it_ != tree.end())
 	{
-		std::map<std::string, std::vector<std::string> >::iterator itPrmtrs = this->prmtrs.find(vecNoAll[i]);
+		for (size_t i = 0; i < it_->children.size(); ++i)
+		{
+			verifyInvalidParamsInContext(it_->children[i].name, it_->children[i]);
+			if (it_->children[i].name == "cgi-bin")
+			{
+				if (it_->children[i].prmtrs.count("cgi_ext") < 1)
+				{
+
+					Logger::error() << "missing cgi_ext in: " << it_->children[i].name; 
+					exit (1);
+				}
+				if (it_->children[i].prmtrs.count("cgi_path") < 1)
+				{
+					Logger::error() << "missing cgi_path in: " << it_->children[i].name; 
+					exit (1);
+				}
+				if (it_->children[i].prmtrs.count("root") < 1)
+				{
+					Logger::error() << "missing root in: " << it_->children[i].name; 
+					exit (1);
+				}
+			}
+		}
+		++it_;
+	}
+}
+
+void	ConfigProcessor::verifyInvalidParamsInContext(const std::string& name, const Node &it ) const
+{
+	std::vector<std::string> vecNoAll;
+	vecNoAll.push_back("listen");
+	vecNoAll.push_back("host");
+	vecNoAll.push_back("server_name");
+	vecNoAll.push_back("error_page");
+	if (name == "cgi-bin")
+	{
+	    vecNoAll.push_back("allow_methods");
+	    vecNoAll.push_back("autoindex");
+	    vecNoAll.push_back("alias");
+	    vecNoAll.push_back("return");
 	}
 
+	for (size_t i = 0; i < vecNoAll.size(); i++)
+	{
+		std::map<std::string, std::vector<std::string> >::const_iterator itPrmtrs = it.prmtrs.find(vecNoAll[i]);
+		if (itPrmtrs != it.prmtrs.end())
+		{
+			Logger::error() << "prmtrs non alloewd here:" << name << " " << itPrmtrs->first;
+			exit(1);
+		}
+	}
+	vecNoAll.clear();
 }
 void	ConfigProcessor::validationParameters( void )
 {
+	validateForbiddenParameters();
 	std::vector<Node>::iterator it_ = tree.begin();
 	while(it_ != tree.end())
 	{

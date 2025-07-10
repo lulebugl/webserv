@@ -146,6 +146,8 @@ class ConfigProcessor
        /*♡♡♡♡♡♡♡♡♡♡♡FT_MSG_ERROR♡♡♡♡♡♡♡♡♡♡♡♡♡*/
 	   void	StreamErrorFind(std::stringstream& ss) const;
        /*♡♡♡♡♡♡♡♡♡♡♡FT_VALIDATION♡♡♡♡♡♡♡♡♡♡♡♡♡*/
+	   void	validateForbiddenParameters( void ) const;
+	   void	verifyInvalidParamsInContext(const std::string& name, const Node &it) const;
 	   void ValidationPath( void ) const;
 		void	countBracket() const;
 		void	recursiveMap( void );

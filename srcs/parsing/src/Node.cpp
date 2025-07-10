@@ -28,15 +28,18 @@ void Node::addDefualtParm( void )
 		prmtrs.insert(std::make_pair("host", vecIp));
 
 	}
-	std::vector<std::string> vecAuto;
-	vecAuto.push_back("off");
-	prmtrs.insert(std::make_pair("autoindex", vecAuto));
-	std::vector<std::string> vecMetho;
-	vecMetho.push_back("GET");
-	prmtrs.insert(std::make_pair("allow_methods", vecMetho));
-	std::vector<std::string> vecIndex;
-	vecIndex.push_back("index.html");
-	prmtrs.insert(std::make_pair("index", vecIndex));
+	if (this->name != "cgi-bin")
+	{
+		std::vector<std::string> vecAuto;
+		vecAuto.push_back("off");
+		prmtrs.insert(std::make_pair("autoindex", vecAuto));
+		std::vector<std::string> vecMetho;
+		vecMetho.push_back("GET");
+		prmtrs.insert(std::make_pair("allow_methods", vecMetho));
+		std::vector<std::string> vecIndex;
+		vecIndex.push_back("index.html");
+		prmtrs.insert(std::make_pair("index", vecIndex));
+	}
 }
 void Node::pushArgInMap( void )
 {
