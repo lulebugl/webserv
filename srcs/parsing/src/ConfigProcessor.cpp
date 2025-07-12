@@ -41,6 +41,15 @@ std::string ConfigProcessor::getBuffer( void ) const
 	return (this->Buffer);
 }
 
+const Node* ConfigProcessor::getRouteNode(int port, const std::string& uri)const
+{
+	std::map<int, Node*>::const_iterator it = Servers.find(port);
+    if (it != Servers.end())
+        return it->second->findChildNode(uri);
+    else
+        return NULL;
+}
+
 const Node* ConfigProcessor::getRouteNode(const std::string& port, const std::string& uri)const
 {
     std::vector<Node>::const_iterator it = tree.begin();
