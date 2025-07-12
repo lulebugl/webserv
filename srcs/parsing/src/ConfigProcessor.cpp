@@ -41,6 +41,133 @@ std::string ConfigProcessor::getBuffer( void ) const
 	return (this->Buffer);
 }
 
+const Node* ConfigProcessor::getRouteNode(const std::string& port, const std::string& uri)const
+{
+    std::vector<Node>::const_iterator it = tree.begin();
+    while(it != tree.end())
+    {
+        std::map<std::string, std::vector<std::string> >::const_iterator listen = it->prmtrs.find("listen");
+		if (listen != it->prmtrs.end() && !listen->second.empty() && listen->second[0] == port)
+		{
+			return it->findChildNode( uri );
+		}
+         ++it;
+    }  
+     return NULL;    
+}
+const std::vector<Node>& ConfigProcessor::getVectorOfServer( void ) const
+{
+	return this->tree;
+}
+
+
+const std::map<std::string, Node*> * ConfigProcessor::getMapOfOneServer( int port ) const
+{
+	std::map<int, Node*>::const_iterator it = Servers.find( port );
+	if (it != Servers.end())
+		return &(it->second->route);
+	else
+		return NULL;
+}
+
+const Node* ConfigProcessor::getServerNode( int port ) const
+{
+	std::map<int, Node*>::const_iterator it = Servers.find( port );
+	if (it != Servers.end())
+		return it->second;
+	else
+		return NULL;
+}
+
+bool ConfigProcessor::hasPort ( int port )
+{
+	std::vector<int>::const_iterator it = std::find( allPort.begin(), allPort.end(), port );
+	if (it != this->allPort.end())
+		return true;
+	else
+		return false;
+}
+const std::map<int, Node*>& ConfigProcessor::getFullMap( void ) const
+{
+	return this->Servers;
+}
+
+const std::vector<int>& ConfigProcessor::getAllPorts( void ) const
+{
+	return this->allPort;
+}
+
+const std::vector<std::string>* ConfigProcessor::getParamOfServer(int port, const std::string& key) const
+{
+	std::map<int, Node*>::const_iterator it = Servers.find( port );
+	if (it != Servers.end())
+	{
+		std::map<std::string, std::vector<std::string> >::const_iterator itKey= it->second->prmtrs.find( key );
+		if (itKey != it->second->prmtrs.end())
+		{
+			return &(itKey->second);
+		}
+		else
+			return NULL;
+	}
+	else
+		return NULL;
+
+}
+
+const std::vector<std::string>* ConfigProcessor::getParamOfRouteNode(int port, const std::string& uri, const std::string& key) const
+{
+	std::map<int, Node*>::const_iterator it = Servers.find( port );
+	if (it != Servers.end())
+	{
+		const Node *current = it->second->findChildNode( uri );
+		if (!current)
+			return NULL;
+		else
+		{
+			std::map<std::string, std::vector<std::string> >::const_iterator itKey = current->prmtrs.find( key );
+			if ( itKey != current->prmtrs.end())
+			{
+				return &(itKey->second);
+			}
+			else
+				return NULL;
+		}
+
+	}
+	else
+		return NULL;
+
+}
+    /*♡♡♡♡♡♡♡♡♡♡♡UTILS♡♡♡♡♡♡♡♡♡♡♡♡♡*/
+void	ConfigProcessor::prepareForCore( void )
+{
+
+	std::vector<Node>::iterator it = tree.begin();
+	while(it != tree.end())
+	{
+		for (size_t i = 0; i < it->children.size(); ++i)
+		{
+			it->route.insert(std::make_pair(it->children[i].name, &it->children[i]));
+		}
+		++it;
+	}
+	it = tree.begin();
+	while(it != tree.end())
+	{
+
+        std::map<std::string, std::vector<std::string> >::const_iterator listen = it->prmtrs.find("listen");
+		if (listen != it->prmtrs.end() && !listen->second.empty())
+		{
+			int port;
+			std::stringstream ss(listen->second[0]);
+			ss >> port;
+			this->allPort.push_back(port);
+			this->Servers.insert(std::make_pair(port, &(*it)));
+		}
+		++it;
+	}
+}
 void	ConfigProcessor::printAllTree( void ) const
 {
 	std::vector<Node>::const_iterator it = tree.begin();
@@ -58,12 +185,13 @@ void	ConfigProcessor::printAllTree( void ) const
 		it_->printMap();
 		std::cout << "Figli" << "\n";
 		  for (size_t i = 0; i < it_->children.size(); ++i)
+		  {
 	  	      it_->children[i].printMap();
+		  }
 		++it_;
 	}
 }
  
-       /*♡♡♡♡♡♡♡♡♡♡♡FT♡♡♡♡♡♡♡♡♡♡♡♡♡*/
 std::string ConfigProcessor::findRemplaceComment(std::string const& input, std::string const& from,
 		std::string const& dilimiter, std::string const& to)  
 {                                              
@@ -89,6 +217,7 @@ std::string ConfigProcessor::findRemplaceComment(std::string const& input, std::
 	}
     return result;                             
 }
+       /*♡♡♡♡♡♡♡♡♡♡♡VALIDATE♡♡♡♡♡♡♡♡♡♡♡♡♡*/
 typedef void (Validator::*ValidateFunction)(const std::vector<std::string>&);
 void	ConfigProcessor::heandelError(ValidateFunction fun, std::map<std::string, std::vector<std::string> >::iterator itPrmtrs, const std::string &name)
 {
@@ -202,14 +331,17 @@ void	ConfigProcessor::heredityClientMaxBody( void )
 	while(it_ != tree.end())
 	{
 		std::map<std::string, std::vector<std::string> >::const_iterator param = it_->prmtrs.find("client_max_body_size");
-		for (size_t i = 0; i < it_->children.size(); ++i)
+		if (param != it_->prmtrs.end())
 		{
-
-			if (param != it_->prmtrs.end() && it_->children[i].name != "cgi-bin")
+			for (size_t i = 0; i < it_->children.size(); ++i)
 			{
-			    it_->children[i].prmtrs.insert(*param);
-			}
 
+				if (param != it_->prmtrs.end() && it_->children[i].name != "cgi-bin")
+				{
+				    it_->children[i].prmtrs.insert(*param);
+				}
+
+			}
 		}
 		++it_;
 	}
@@ -472,6 +604,7 @@ void ConfigProcessor::tokenize( void )
 	RicorsiveTree(tokenStream);
 	recursiveMap();
 	validationParameters();
+	prepareForCore();
 }
  
        /*♡♡♡♡♡♡♡♡♡♡♡OPERATOR♡♡♡♡♡♡♡♡♡♡♡♡♡*/

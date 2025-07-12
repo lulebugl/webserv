@@ -4,6 +4,7 @@
 
 #include "../../../includes/Logger.hpp"
 #include <vector>
+#include <algorithm>  // per std::find
 #include <iostream>
 #include <string>
 #include <sstream>   // ← necessario per std::stringstream
@@ -100,13 +101,28 @@ struct	Node
 	std::vector<std::string> array;
 	std::vector<Node> children;
 	std::map<std::string, std::vector<std::string> > prmtrs; 
-	void	clearMap( void );
-	void	pushArgInMap( void );
+	std::map<std::string, Node*> route;
+       /*♡♡♡♡♡♡♡♡♡♡♡GETTER♡♡♡♡♡♡♡♡♡♡♡♡♡*/
+/*♡♡♡♡♡♡♡♡♡♡♡ FIND CHILD NODE ♡♡♡♡♡♡♡♡♡♡♡*/
+/**
+ * ♡ Searches among this Node’s children for a child Node matching the given URI ♡
+ * ♡ 
+ * ♡ @param uri The URI string to look for among children ♡
+ * ♡ @return A pointer to the const child Node if found, otherwise nullptr ♡
+ */
+	const Node* findChildNode( const std::string& uri) const;
+
+       /*♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡*/
+       /*♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡*/
+       /*♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡*/
+
 	void	printMap(void)const;
-	void	addDefualtParm(void);
 
 	void	printSubtree(const std::string &prefix, bool isLast) const;
 	void	printTree() const ;
+	void	addDefualtParm(void);
+	void	pushArgInMap( void );
+	void	clearMap( void );
 };
 
 typedef void (Validator::*ValidateFunction)(const std::vector<std::string>&);
@@ -121,6 +137,39 @@ class ConfigProcessor
        /*♡♡♡♡♡♡♡♡♡♡♡GETTER♡♡♡♡♡♡♡♡♡♡♡♡♡*/
 	   std::string	getPath( void ) const;
 	   std::string	getBuffer( void ) const;
+
+        // ♡ Returns a const reference to the main vector of server nodes ♡
+        const std::vector<Node>& getVectorOfServer(void) const;
+
+        // ♡ Returns a const reference to the complete map of servers indexed by port ♡
+        const std::map<int, Node*>& getFullMap(void) const;
+
+        // ♡ Returns a const pointer to the map of routes (uri -> Node*) for a server by its port ♡
+        // ♡ Returns nullptr if the port does not exist ♡
+        const std::map<std::string, Node*>* getMapOfOneServer(int port) const;
+
+        // ♡ Returns a const pointer to the route node specified by port and URI ♡
+        // ♡ Returns nullptr if not found ♡
+        const Node* getRouteNode(const std::string& port, const std::string& uri) const;
+
+        // ♡ Returns a const pointer to the server node associated with the specified port ♡
+        // ♡ Returns nullptr if the port does not exist ♡
+        const Node* getServerNode(int port) const;
+
+        // ♡ Returns a const reference to the vector containing all configured server ports ♡
+        const std::vector<int>& getAllPorts() const;
+
+        // ♡ Checks whether a given port is present among the configured ports ♡
+        bool hasPort(int port);
+
+        // ♡ Returns a const pointer to the vector of strings associated with a key (parameter) for a server specified by port ♡
+        // ♡ Returns nullptr if the port or key do not exist ♡
+        const std::vector<std::string>* getParamOfServer(int port, const std::string& key) const;
+
+        // ♡ Returns a const pointer to the vector of strings associated with a key (parameter) for a route specified by port and URI ♡
+        // ♡ Returns nullptr if the port, URI, or key do not exist ♡
+        const std::vector<std::string>* getParamOfRouteNode(int port, const std::string& uri, const std::string& key) const;
+
 	   void			printAllTree( void ) const;
 
 
@@ -137,12 +186,15 @@ class ConfigProcessor
 	   const std::string	PathFile;
 	   std::string		Buffer;
 	   std::vector<Node> tree;
+	   std::map<int, Node*> Servers;
+	   std::vector<int>		allPort;
        /*♡♡♡♡♡♡♡♡♡♡♡FT♡♡♡♡♡♡♡♡♡♡♡♡♡*/
 	   std::string findRemplaceComment(std::string const& input,
 			   std::string const& from, std::string const& dilimiter,
 			   std::string const& to);  
 	   void	RicorsiveTree(std::stringstream& sstoken, bool flags = true);
 	   void	treeParser(std::stringstream& sstoken, Node& token);
+	   void prepareForCore( void );
        /*♡♡♡♡♡♡♡♡♡♡♡FT_MSG_ERROR♡♡♡♡♡♡♡♡♡♡♡♡♡*/
 	   void	StreamErrorFind(std::stringstream& ss) const;
        /*♡♡♡♡♡♡♡♡♡♡♡FT_VALIDATION♡♡♡♡♡♡♡♡♡♡♡♡♡*/

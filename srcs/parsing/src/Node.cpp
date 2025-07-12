@@ -1,6 +1,16 @@
 
 #include "../include/ConfigProcessor.hpp"
+       /*♡♡♡♡♡♡♡♡♡GETTER♡♡♡♡♡♡♡♡♡♡♡♡♡♡*/
+const Node*	Node::findChildNode(const std::string& uri)const
+{
+	std::map<std::string, Node*>::const_iterator it	= route.find( uri );
+	if (it != route.end())
+		return it->second;
+	else
+		return NULL;
+}
        /*♡♡♡♡♡♡♡♡♡♡♡FORMATTER_PARAMATERS♡♡♡♡♡♡♡♡♡♡♡♡♡*/
+       /*♡♡♡♡♡♡♡♡♡GETTER♡♡♡♡♡♡♡♡♡♡♡♡♡♡*/
 void Node::clearMap( void )
 {
 	std::map<std::string, std::vector<std::string> >::iterator it = prmtrs.begin();
@@ -10,8 +20,18 @@ for (; it != prmtrs.end(); ++it)
         std::vector<std::string>& vec = it->second;
         if (!vec.empty()) 
 		{
+			size_t pos;
             std::string& sub = vec.back();
-            sub.erase(sub.find_last_not_of(";") + 1);
+			if ((pos = sub.find(";")) != std::string::npos)
+			{
+				sub.erase(sub.find_last_not_of(";") + 1);
+			}
+			else
+			{
+				Logger::error() << "Syntax error at: " << sub << " in parameter: " << it->first;
+				exit (1);
+			}
+			
 		}
 	}
 }
@@ -113,16 +133,7 @@ void Node::printSubtree(const std::string& prefix, bool isLast) const {
     std::cout << (isLast ? "└── " : "├── ");
     std::cout << name << "\n";
 	std::vector<std::string>::const_iterator it = array.begin();
-
 	(void)it;
-//	while(it != array.end())
-//	{
-//		std::cout << (isLast ? "   └── " : "   ├── ");
-//		std::cout << *it << "\n";
-//		++it;
-//	}
-	
-
     for (size_t i = 0; i < children.size(); ++i) {
         bool childIsLast = (i == children.size() - 1);
         std::string newPrefix = prefix + (isLast ? "    " : "│   ");
