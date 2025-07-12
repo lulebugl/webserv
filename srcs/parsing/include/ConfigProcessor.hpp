@@ -149,7 +149,7 @@ class ConfigProcessor
         const std::map<std::string, Node*>* getMapOfOneServer(int port) const;
 
         // ♡ Returns a const pointer to the route node specified by port and URI ♡
-        // ♡ Returns nullptr if not found ♡
+        // ♡ Returns nullptr if not found .
         const Node* getRouteNode(const std::string& port, const std::string& uri) const;
         const Node* getRouteNode(int port, const std::string& uri) const;
 
