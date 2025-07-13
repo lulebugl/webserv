@@ -229,7 +229,7 @@ std::string ConfigProcessor::findRemplaceComment(std::string const& input, std::
 }
        /*♡♡♡♡♡♡♡♡♡♡♡VALIDATE♡♡♡♡♡♡♡♡♡♡♡♡♡*/
 typedef void (Validator::*ValidateFunction)(const std::vector<std::string>&);
-void	ConfigProcessor::heandelError(ValidateFunction fun, std::map<std::string, std::vector<std::string> >::iterator itPrmtrs, const std::string &name)
+int	ConfigProcessor::heandelError(ValidateFunction fun, std::map<std::string, std::vector<std::string> >::iterator itPrmtrs, const std::string &name)
 {
 		try
 		{
@@ -252,11 +252,12 @@ void	ConfigProcessor::heandelError(ValidateFunction fun, std::map<std::string, s
 		{
 			Logger::error() << e.what() <<  " " << itPrmtrs->first; ;
 		//	this->~ConfigProcessor(); //Cannon
-			exit(1);
+			return (1);
 		}
+		return (0);
 }
 
-void	ConfigProcessor::validateForbiddenParameters( void ) const
+int ConfigProcessor::validateForbiddenParameters( void ) const
 {
 	std::vector<Node>::const_iterator it_ = tree.begin();
 	while(it_ != tree.end())
@@ -270,25 +271,26 @@ void	ConfigProcessor::validateForbiddenParameters( void ) const
 				{
 
 					Logger::error() << "missing cgi_ext in: " << it_->children[i].name; 
-					exit (1);
+					return (1);
 				}
 				if (it_->children[i].prmtrs.count("cgi_path") < 1)
 				{
 					Logger::error() << "missing cgi_path in: " << it_->children[i].name; 
-					exit (1);
+					return (1);
 				}
 				if (it_->children[i].prmtrs.count("root") < 1)
 				{
 					Logger::error() << "missing root in: " << it_->children[i].name; 
-					exit (1);
+					return (1);
 				}
 			}
 		}
 		++it_;
 	}
+	return (0);
 }
 
-void	ConfigProcessor::verifyInvalidParamsInContext(const std::string& name, const Node &it ) const
+int	ConfigProcessor::verifyInvalidParamsInContext(const std::string& name, const Node &it ) const
 {
 	std::vector<std::string> vecNoAll;
 	vecNoAll.push_back("listen");
@@ -309,13 +311,14 @@ void	ConfigProcessor::verifyInvalidParamsInContext(const std::string& name, cons
 		if (itPrmtrs != it.prmtrs.end())
 		{
 			Logger::error() << "prmtrs non alloewd here: " << name << " " << itPrmtrs->first;
-			exit(1);
+			return (1);
 		}
 	}
 	vecNoAll.clear();
+	return (0);
 }
 
-void	ConfigProcessor::validateCgiBin( void ) const
+int 	ConfigProcessor::validateCgiBin( void ) const
 {
 	size_t count = 0;
 	std::vector<Node>::const_iterator it_ = tree.begin();
@@ -330,10 +333,11 @@ void	ConfigProcessor::validateCgiBin( void ) const
 		if ( count < 1 )
 		{
 			Logger::error() << "Cgi-bin, is mandatory parameter";
-			exit(1);
+			return (1);
 		}
 		++it_;
 	}
+	return (0);
 }
 
 void	ConfigProcessor::heredityClientMaxBody( void )
@@ -359,7 +363,7 @@ void	ConfigProcessor::heredityClientMaxBody( void )
 
 }
 
-void	ConfigProcessor::validateDifferentPortServer( void ) const
+int  ConfigProcessor::validateDifferentPortServer( void ) const
 {
 	std::vector<Node>::const_iterator it_ = tree.begin();
 	while(it_ != tree.end())
@@ -382,8 +386,7 @@ void	ConfigProcessor::validateDifferentPortServer( void ) const
 					if (compare->second[0] == listen->second[0])
 					{
 						Logger::error() << "Servers must have different listening to each other the port is: " << compare->second[0];
-					//	this->~ConfigProcessor(); //Cannon
-						exit(1);
+						return (1);
 					}
 				}
 				i++;
@@ -391,12 +394,15 @@ void	ConfigProcessor::validateDifferentPortServer( void ) const
 		}
 		++it_;
 	}
+	return (0);
 }
 
-void	ConfigProcessor::validationParameters( void )
+int	ConfigProcessor::validationParameters( void )
 {
-	validateCgiBin();
-	validateForbiddenParameters();
+	if (validateCgiBin() == 1)
+		return (1);
+	if (validateForbiddenParameters() == 1)
+		return (1);
 	heredityClientMaxBody();
 	std::vector<Node>::iterator it_ = tree.begin();
 	while(it_ != tree.end())
@@ -405,7 +411,7 @@ void	ConfigProcessor::validationParameters( void )
 		if (it_->prmtrs.count("listen")  < 1)
 		{
 			Logger::error() << "listening port, is mandatory parameter";
-			exit(1);
+			return (1);
 		}
 		while(itPrmtrs != it_->prmtrs.end())
 		{
@@ -413,7 +419,8 @@ void	ConfigProcessor::validationParameters( void )
 			if (itFunc != this->valval.funcMap.end())	 
 			{
 				ValidateFunction func =itFunc->second;
-				heandelError(func, itPrmtrs, it_->name);
+				if (heandelError(func, itPrmtrs, it_->name) == 1)
+					return (0);
 			}
 			++itPrmtrs;
 
@@ -428,7 +435,8 @@ void	ConfigProcessor::validationParameters( void )
 				if (itFunc != this->valval.funcMap.end())	 
 				{
 					ValidateFunction func =itFunc->second;
-					heandelError(func, itPrmtrs, itChild->name);
+					if (heandelError(func, itPrmtrs, itChild->name) == 1)
+						return (1);
 				}
 				++itPrmtrs;
 
@@ -437,7 +445,9 @@ void	ConfigProcessor::validationParameters( void )
 		}
 		++it_;
 	}
-	validateDifferentPortServer();
+	if (validateDifferentPortServer() == 1)
+		return (1);
+	return (0);
 	//TODO: Validare che tutti i server abbiano un listen diverso OK! aggiungere giusto il controllo se é empty
 	//TODO: Ovveride client_max_body_size
 }
@@ -529,7 +539,7 @@ void	ConfigProcessor::StreamErrorFind(std::stringstream& ss) const
 }
 #include <iostream>
 #include <sys/stat.h>
-void	ConfigProcessor::ValidationPath() const
+int		ConfigProcessor::ValidationPath() const
 {
 	const std::string exte = ".conf";
 	size_t	posDoth = PathFile.rfind(exte);
@@ -540,24 +550,25 @@ void	ConfigProcessor::ValidationPath() const
 					Logger::info() << "Valid extension, try open file";
 					if (stat(PathFile.c_str(), &sb) == 0 && (sb.st_mode & S_IFDIR)){
 						Logger::error() << "the configuration must be a file";
-						exit(1);
+						return (1);
 					}
 		}
 		else
 		{
 			Logger::error() << "The file must end with '.conf'";
-			exit (1);
+			return (1);
 		}
 
 	}
 	else
 	{
 		Logger::error() << "The configuration file must have a '.conf' extension";
-		exit (1);
+		return (1);
 	}
+	return (0);
 }
 
-void	ConfigProcessor::countBracket() const
+int 	ConfigProcessor::countBracket() const
 {
 	int bracket = 0;
 	for (size_t i = 0; i < Buffer.length(); ++i) {
@@ -569,22 +580,29 @@ void	ConfigProcessor::countBracket() const
 	if (bracket != 0)
 	{
 		Logger::error() << "Brackets don't close properly";
-		exit(-1);
+		return (1);
 	}
-	return ;
+	return (0);
 }
 
-void	ConfigProcessor::recursiveMap( void )
+int	ConfigProcessor::recursiveMap( void )
 {
 
 	std::vector<Node>::iterator it = tree.begin();
 	while(it != tree.end())
 	{
-		it->pushArgInMap();
-		  for (size_t i = 0; i < it->children.size(); ++i)
-	  	      it->children[i].pushArgInMap();
+		if (it->pushArgInMap() == 1)
+		{
+			return (1);
+		}
+		for (size_t i = 0; i < it->children.size(); ++i)
+		{
+	  	    if (it->children[i].pushArgInMap() == 1)
+		  	  return (1);
+		}
 		++it;
 	}
+	return (0);
 }
 
 static bool CheckFileStream(std::ifstream& file, const std::string& filename)
@@ -619,15 +637,16 @@ static bool CheckFileStream(std::ifstream& file, const std::string& filename)
     return true;
 }
 
-void ConfigProcessor::tokenize( void )
+int	ConfigProcessor::tokenize( void )
 {
-	ValidationPath();
+	if (ValidationPath() == 1)
+		return (1);
 	std::ifstream file(this->PathFile.c_str());
 	if(!CheckFileStream(file, this->PathFile))
 	{
 		Logger::error() << "Error stream";
 		file.close();
-		return ;
+		return (1);
 	}
 /* ♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡
 	// Use a stringstream to read the entire file content into memory ♡♡♡♡♡♡
@@ -644,7 +663,8 @@ void ConfigProcessor::tokenize( void )
      * The `findRemplaceComment` function performs this operation. 
  ♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡ */
 	this->Buffer = findRemplaceComment(this->Buffer, "#", "\n", "\n");
-	countBracket();
+	if (countBracket() == 1)
+		return (1);
 /* ♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡
  * Create a stringstream from the cleaned buffer, allowing tokenization using >>.
  * Then pass it to treeParser for building the configuration tree structure.
@@ -653,9 +673,12 @@ void ConfigProcessor::tokenize( void )
     std::stringstream tokenStream(this->Buffer);
 	StreamErrorFind(tokenStream);	
 	RicorsiveTree(tokenStream);
-	recursiveMap();
-	validationParameters();
+	if (recursiveMap() == 1)
+		return (1);
+	if (validationParameters() == 1)
+		return (1);
 	prepareForCore();
+	return (0);
 }
  
        /*♡♡♡♡♡♡♡♡♡♡♡OPERATOR♡♡♡♡♡♡♡♡♡♡♡♡♡*/

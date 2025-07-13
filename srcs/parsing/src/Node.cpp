@@ -11,7 +11,7 @@ const Node*	Node::findChildNode(const std::string& uri)const
 }
        /*♡♡♡♡♡♡♡♡♡♡♡FORMATTER_PARAMATERS♡♡♡♡♡♡♡♡♡♡♡♡♡*/
        /*♡♡♡♡♡♡♡♡♡GETTER♡♡♡♡♡♡♡♡♡♡♡♡♡♡*/
-void Node::clearMap( void )
+int	Node::clearMap( void )
 {
 	std::map<std::string, std::vector<std::string> >::iterator it = prmtrs.begin();
 
@@ -29,11 +29,12 @@ for (; it != prmtrs.end(); ++it)
 			else
 			{
 				Logger::error() << "Syntax error at: " << sub << " in parameter: " << it->first;
-				exit (1);
+				return (1);
 			}
 			
 		}
 	}
+	return (0);
 }
 
 void Node::addDefualtParm( void )
@@ -64,7 +65,7 @@ void Node::addDefualtParm( void )
 		prmtrs.insert(std::make_pair("index", vecIndex));
 	}
 }
-void Node::pushArgInMap( void )
+int Node::pushArgInMap( void )
 {
 	std::vector<std::string>::iterator it = array.begin();
     std::string key;
@@ -91,8 +92,10 @@ void Node::pushArgInMap( void )
 			prmtrs.insert(std::make_pair(key, std::vector<std::string>(start, end + 1)));
 		key.clear();
     }
-	clearMap();
+	if (clearMap() == 1)
+		return (1);
 	addDefualtParm();
+	return (0);
 }
 
        /*♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡*/

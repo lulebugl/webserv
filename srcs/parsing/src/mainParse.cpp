@@ -7,7 +7,8 @@ int	main(int argv, char **argc)
 	    Logger::setLevel(LOG_LEVEL_DEBUG);
 	    Logger::enableColors(true);
 		ConfigProcessor conf((std::string(argc[1])));
-		conf.tokenize();
+		if (conf.tokenize() == 1)
+			return (1);
 		conf.printAllTree();
 		// test getter
 		const std::vector<std::string> *info = conf.getParamOfRouteNode(8080, "/happie", "allow_methods");

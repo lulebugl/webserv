@@ -121,8 +121,8 @@ struct	Node
 	void	printSubtree(const std::string &prefix, bool isLast) const;
 	void	printTree() const ;
 	void	addDefualtParm(void);
-	void	pushArgInMap( void );
-	void	clearMap( void );
+	int		pushArgInMap( void );
+	int		clearMap( void );
 };
 
 typedef void (Validator::*ValidateFunction)(const std::vector<std::string>&);
@@ -175,7 +175,7 @@ class ConfigProcessor
 
 
        /*♡♡♡♡♡♡♡♡♡♡♡FT♡♡♡♡♡♡♡♡♡♡♡♡♡*/
-	   void	tokenize( void );
+	   int	tokenize( void );
 
        ConfigProcessor& operator=(ConfigProcessor const & rsh);    //Cannon
  
@@ -196,19 +196,19 @@ class ConfigProcessor
 	   void	RicorsiveTree(std::stringstream& sstoken, bool flags = true);
 	   void	treeParser(std::stringstream& sstoken, Node& token);
 	   void prepareForCore( void );
+	   void	heredityClientMaxBody( void );
+	   int	recursiveMap( void );
        /*♡♡♡♡♡♡♡♡♡♡♡FT_MSG_ERROR♡♡♡♡♡♡♡♡♡♡♡♡♡*/
 	   void	StreamErrorFind(std::stringstream& ss) const;
        /*♡♡♡♡♡♡♡♡♡♡♡FT_VALIDATION♡♡♡♡♡♡♡♡♡♡♡♡♡*/
-	   void		validateForbiddenParameters( void ) const;
-	   void		verifyInvalidParamsInContext(const std::string& name, const Node &it) const;
-	   void		validateDifferentPortServer( void ) const;
-	   void		ValidationPath( void ) const;
-	   void		validateCgiBin( void ) const;
-	   void		heredityClientMaxBody( void );
-		void	countBracket() const;
-		void	recursiveMap( void );
-		void	validationParameters( void );
-		void	heandelError(ValidateFunction fun, std::map<std::string, std::vector<std::string> >::iterator itPrmtrs, const std::string &name);
+	   int		validateForbiddenParameters( void ) const;
+	   int		verifyInvalidParamsInContext(const std::string& name, const Node &it) const;
+	   int		validateDifferentPortServer( void ) const;
+	   int		ValidationPath( void ) const;
+	   int		validateCgiBin( void ) const;
+		int	countBracket() const;
+		int	validationParameters( void );
+		int	heandelError(ValidateFunction fun, std::map<std::string, std::vector<std::string> >::iterator itPrmtrs, const std::string &name);
        /*♡♡♡♡♡♡♡♡♡♡♡OPERATOR♡♡♡♡♡♡♡♡♡♡♡♡♡*/
 
 };
