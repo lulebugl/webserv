@@ -251,6 +251,7 @@ void	ConfigProcessor::heandelError(ValidateFunction fun, std::map<std::string, s
 		catch (std::exception& e)
 		{
 			Logger::error() << e.what() <<  " " << itPrmtrs->first; ;
+		//	this->~ConfigProcessor(); //Cannon
 			exit(1);
 		}
 }
@@ -371,13 +372,17 @@ void	ConfigProcessor::validateDifferentPortServer( void ) const
 			{
 				size_t idx = std::distance(tree.begin(), it_);
 				if ( idx == i)
-					break ;
+				{
+					i++;
+					continue ;
+				}
 				std::map<std::string, std::vector<std::string> >::const_iterator compare = tree[i].prmtrs.find("listen");
 				if (compare != tree[i].prmtrs.end())
 				{
 					if (compare->second[0] == listen->second[0])
 					{
 						Logger::error() << "Servers must have different listening to each other the port is: " << compare->second[0];
+					//	this->~ConfigProcessor(); //Cannon
 						exit(1);
 					}
 				}
@@ -513,11 +518,11 @@ void	ConfigProcessor::StreamErrorFind(std::stringstream& ss) const
 {
 	if (ss.fail())
 	{
-	    std::cerr << "Errore di formato o estrazione fallita (failbit set)" << std::endl;
+	    Logger::error()<< "Errore di formato o estrazione fallita (failbit set)";
 	    if (ss.eof())
-	        std::cerr << "Si è raggiunta la fine dello stream (eofbit set)" << std::endl;
+	        Logger::error() << "Si è raggiunta la fine dello stream (eofbit set)";
 	    if (ss.bad())
-	        std::cerr << "Errore grave di stream (badbit set)" << std::endl;
+	        Logger::error()<< "Errore grave di stream (badbit set)";
 	}
 	else
 		Logger::info() << "Stream OK!";
@@ -535,16 +540,20 @@ void	ConfigProcessor::ValidationPath() const
 					Logger::info() << "Valid extension, try open file";
 					if (stat(PathFile.c_str(), &sb) == 0 && (sb.st_mode & S_IFDIR)){
 						Logger::error() << "the configuration must be a file";
-						exit(-1);
+						exit(1);
 					}
 		}
 		else
-			exit (-1);
+		{
+			Logger::error() << "The file must end with '.conf'";
+			exit (1);
+		}
 
 	}
 	else
 	{
-			exit (-1);
+		Logger::error() << "The configuration file must have a '.conf' extension";
+		exit (1);
 	}
 }
 
@@ -578,14 +587,46 @@ void	ConfigProcessor::recursiveMap( void )
 	}
 }
 
+static bool CheckFileStream(std::ifstream& file, const std::string& filename)
+{
+    if (!file.is_open())
+	{
+        Logger::error() << "Failed to open configuration file: " << filename;
+        return false;
+    }
+
+    if (file.bad())
+	{
+        Logger::error() << "I/O error while accessing file: " << filename;
+        return false;
+    }
+  
+    if (file.fail())
+	{
+        Logger::error() << "Logical error on file stream for: " << filename;
+        return false;
+    }
+
+    if (file.eof())
+	{
+        Logger::error() << "End of file reached immediately for: " << filename;
+        return false;
+    }
+
+    if (file.good())
+        Logger::info() << "File stream is valid: " << filename;
+
+    return true;
+}
+
 void ConfigProcessor::tokenize( void )
 {
 	ValidationPath();
 	std::ifstream file(this->PathFile.c_str());
-	if(!file ||file.eof())
+	if(!CheckFileStream(file, this->PathFile))
 	{
-		// TODO:(e.g., log or throw an exception) ♡♡♡♡♡♡
 		Logger::error() << "Error stream";
+		file.close();
 		return ;
 	}
 /* ♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡
