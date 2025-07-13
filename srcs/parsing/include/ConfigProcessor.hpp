@@ -199,7 +199,7 @@ class ConfigProcessor
 	   void	heredityClientMaxBody( void );
 	   int	recursiveMap( void );
        /*♡♡♡♡♡♡♡♡♡♡♡FT_MSG_ERROR♡♡♡♡♡♡♡♡♡♡♡♡♡*/
-	   void	StreamErrorFind(std::stringstream& ss) const;
+	   int	StreamErrorFind(std::stringstream& ss) const;
        /*♡♡♡♡♡♡♡♡♡♡♡FT_VALIDATION♡♡♡♡♡♡♡♡♡♡♡♡♡*/
 	   int		validateForbiddenParameters( void ) const;
 	   int		verifyInvalidParamsInContext(const std::string& name, const Node &it) const;

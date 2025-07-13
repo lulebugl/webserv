@@ -524,18 +524,26 @@ void	ConfigProcessor::treeParser(std::stringstream& sstoken, Node& current)
         return;
 }
 
-void	ConfigProcessor::StreamErrorFind(std::stringstream& ss) const
+int	ConfigProcessor::StreamErrorFind(std::stringstream& ss) const
 {
 	if (ss.fail())
 	{
 	    Logger::error()<< "Errore di formato o estrazione fallita (failbit set)";
 	    if (ss.eof())
+		{
 	        Logger::error() << "Si è raggiunta la fine dello stream (eofbit set)";
+		}
 	    if (ss.bad())
+		{
 	        Logger::error()<< "Errore grave di stream (badbit set)";
+		}
+		return (1);
 	}
 	else
+	{
 		Logger::info() << "Stream OK!";
+	}
+	return (0);
 }
 #include <iostream>
 #include <sys/stat.h>
@@ -652,7 +660,8 @@ int	ConfigProcessor::tokenize( void )
 	// Use a stringstream to read the entire file content into memory ♡♡♡♡♡♡
  ♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡ */
 	std::stringstream ss;
-	StreamErrorFind(ss);
+	if (StreamErrorFind(ss) == 1)
+		return (1);
 	ss << file.rdbuf();
 	file.close();
 	this->Buffer = ss.str();
@@ -671,7 +680,8 @@ int	ConfigProcessor::tokenize( void )
  ♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡ */
 
     std::stringstream tokenStream(this->Buffer);
-	StreamErrorFind(tokenStream);	
+	if (StreamErrorFind(tokenStream) == 1)	
+		return (1);
 	RicorsiveTree(tokenStream);
 	if (recursiveMap() == 1)
 		return (1);
