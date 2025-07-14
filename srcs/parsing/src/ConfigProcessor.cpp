@@ -6,7 +6,7 @@
 /*   By: jfranco <jfranco@student.s19.be>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 19:28:53 by jfranco           #+#    #+#             */
-/*   Updated: 2025/07/10 19:20:10 by jfranco          ###   ########.fr       */
+/*   Updated: 2025/07/14 18:41:03 by jfranco          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,7 +107,7 @@ const std::vector<int>& ConfigProcessor::getAllPorts( void ) const
 	return this->allPort;
 }
 
-const std::vector<std::string>* ConfigProcessor::getParamOfServer(int port, const std::string& key) const
+const std::vector<std::string>* ConfigProcessor::getParam(int port, const std::string& key) const
 {
 	std::map<int, Node*>::const_iterator it = Servers.find( port );
 	if (it != Servers.end())
@@ -125,7 +125,7 @@ const std::vector<std::string>* ConfigProcessor::getParamOfServer(int port, cons
 
 }
 
-const std::vector<std::string>* ConfigProcessor::getParamOfRouteNode(int port, const std::string& uri, const std::string& key) const
+const std::vector<std::string>* ConfigProcessor::getParam(int port, const std::string& uri, const std::string& key) const
 {
 	std::map<int, Node*>::const_iterator it = Servers.find( port );
 	if (it != Servers.end())
@@ -148,6 +148,58 @@ const std::vector<std::string>* ConfigProcessor::getParamOfRouteNode(int port, c
 	else
 		return NULL;
 
+}
+const std::string*	ConfigProcessor::getErrorPage(int port, const std::string& error, const std::string& uri) const
+{
+	size_t	pos;
+
+	std::map<int, Node*>::const_iterator it = Servers.find( port );
+	if (it != Servers.end())
+	{
+		const Node *current =  it->second->findChildNode( uri );
+		if (!current)
+		{
+			return NULL;
+		}
+		std::map<std::string, std::vector<std::string> >::const_iterator itChildren = current->prmtrs.begin();
+		while (itChildren != current->prmtrs.end())
+		{
+			if ((pos = itChildren->first.find(error, 0)) !=std::string::npos)
+			{
+				return &(itChildren->second[0]);
+			}
+			++itChildren;
+		}
+		std::map<std::string, std::vector<std::string> >::const_iterator itMain = it->second->prmtrs.begin();
+		while (itMain != it->second->prmtrs.end())
+		{
+			if ((pos = itMain->first.find(error, 0))  !=std::string::npos)
+			{
+				return &(itMain->second[0]);
+			}
+			itMain++;
+		}
+	}
+	return NULL;
+}
+
+const std::string*	ConfigProcessor::getErrorPage(int port, const std::string& error ) const
+{
+	size_t	pos;
+	std::map<int, Node*>::const_iterator it = Servers.find( port );
+	if (it != Servers.end())
+	{
+		std::map<std::string, std::vector<std::string> >::const_iterator itMain = it->second->prmtrs.begin();
+		while (itMain != it->second->prmtrs.end())
+		{
+			if ((pos = itMain->first.find(error, 0))  !=std::string::npos)
+			{
+				return &(itMain->second[0]);
+			}
+			itMain++;
+		}
+	}
+	return NULL;
 }
     /*♡♡♡♡♡♡♡♡♡♡♡UTILS♡♡♡♡♡♡♡♡♡♡♡♡♡*/
 void	ConfigProcessor::prepareForCore( void )
@@ -229,6 +281,54 @@ std::string ConfigProcessor::findRemplaceComment(std::string const& input, std::
 }
        /*♡♡♡♡♡♡♡♡♡♡♡VALIDATE♡♡♡♡♡♡♡♡♡♡♡♡♡*/
 typedef void (Validator::*ValidateFunction)(const std::vector<std::string>&);
+
+int	ConfigProcessor::validateErrorPage( void )
+{
+	size_t	pos;
+	//do nothung
+	for (size_t i = 0; i < tree.size(); ++i)
+	{
+		std::map<std::string, std::vector<std::string> >::const_iterator it = tree[i].prmtrs.begin();
+		while (it != tree[i].prmtrs.end())
+		{
+			if ((pos = it->first.find("error", 0, 5))  !=std::string::npos)
+			{
+				try 
+				{
+					this->valval.validateErrorPage(it->second);
+				}
+				catch (std::exception& e)
+				{
+					Logger::error() << e.what() << tree[i].name;
+					return (1);
+				}
+			}
+			it++;
+		}
+		for (size_t y = 0; y < tree[i].children.size(); ++y)
+		{
+			std::map<std::string, std::vector<std::string> >::const_iterator itChildren = tree[i].children[y].prmtrs.begin();
+			while (itChildren != tree[i].children[y].prmtrs.end())
+			{
+				if ((pos = itChildren->first.find("error", 0, 5)) !=std::string::npos)
+				{
+					try 
+					{
+						this->valval.validateErrorPage(itChildren->second);
+					}
+					catch (std::exception& e)
+					{
+						Logger::error() << e.what() << tree[i].children[y].name;
+						return (1);
+					}
+				}
+				++itChildren;
+			}
+
+		}
+	}
+	return (0);
+}
 int	ConfigProcessor::heandelError(ValidateFunction fun, std::map<std::string, std::vector<std::string> >::iterator itPrmtrs, const std::string &name)
 {
 		try
@@ -404,6 +504,8 @@ int	ConfigProcessor::validationParameters( void )
 	if (validateForbiddenParameters() == 1)
 		return (1);
 	heredityClientMaxBody();
+	if (this->validateErrorPage() == 1)
+		return (1);
 	std::vector<Node>::iterator it_ = tree.begin();
 	while(it_ != tree.end())
 	{
@@ -413,6 +515,11 @@ int	ConfigProcessor::validationParameters( void )
 			Logger::error() << "listening port, is mandatory parameter";
 			return (1);
 		}
+		if (it_->prmtrs.count("alias") != 0 || it_->prmtrs.count("cgi_path") != 0 || it_->prmtrs.count("cg_ext") != 0 || it_->prmtrs.count("allow_methods") != 0)
+		{
+			Logger::error() << "forbitten prmtrs in server main";
+			return (1);
+		}
 		while(itPrmtrs != it_->prmtrs.end())
 		{
 			std::map<std::string, ValidateFunction>::iterator itFunc = this->valval.funcMap.find(itPrmtrs->first);
@@ -420,7 +527,7 @@ int	ConfigProcessor::validationParameters( void )
 			{
 				ValidateFunction func =itFunc->second;
 				if (heandelError(func, itPrmtrs, it_->name) == 1)
-					return (0);
+					return (1);
 			}
 			++itPrmtrs;
 

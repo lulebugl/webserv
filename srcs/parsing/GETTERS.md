@@ -31,10 +31,10 @@ This project provides **multiple ways** to explore and access configuration data
 
 #### 3. Accessing Parameters (Key-Value pairs)
 
-- `getParamOfServer(port, key)`  
+- `getParam(port, key)`  
   Returns the **values of a parameter key** for the specified server.
 
-- `getParamOfRouteNode(port, uri, key)`  
+- `getParam(port, uri, key)`  
   Returns the **values of a parameter key** inside a specific route of a server.
 
 #### 4. Navigating Children Nodes directly (`Node` method)
@@ -44,6 +44,16 @@ This project provides **multiple ways** to explore and access configuration data
   It returns a pointer to the matching child node if found, or `nullptr` if no child matches.  
 
   Use this when you already have a `Node` (like a server node) and want to quickly find one of its route children by URI without iterating manually.
+#### 5. Retrieving Custom Error Pages
+
+- `getErrorPage(port, error)`
+  Returns a pointer to the configured error page path for the specified server port and HTTP error code.
+  Looks up the server-level configuration only and returns `nullptr` if no match is found.
+
+- `getErrorPage(port, error, uri)`
+  Similar to the above but first searches within the route (location) matching the given URI inside the specified server.
+  Falls back to the server-level configuration if no location-specific error page is found.
+  Returns a pointer to the error page path or `nullptr` if none is configured.
 
 ---
 
@@ -58,6 +68,7 @@ This project provides **multiple ways** to explore and access configuration data
   - Routes inside servers  
   - Parameters inside servers or routes  
 - Use `findChildNode` on a Node to find a child route directly by URI, making navigation easier and cleaner.
+> All functions return a pointer to internal configuration data valid as long as the `ConfigProcessor` instance is alive.
 
 ---
 

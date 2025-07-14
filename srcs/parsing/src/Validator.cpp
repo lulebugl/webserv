@@ -6,7 +6,7 @@
 /*   By: jfranco <jfranco@student.s19.be>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/08 13:42:00 by jfranco           #+#    #+#             */
-/*   Updated: 2025/07/10 16:49:50 by jfranco          ###   ########.fr       */
+/*   Updated: 2025/07/14 17:40:27 by jfranco          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,9 +27,21 @@ Validator::Validator()
 	this->funcMap.insert(std::make_pair("alias", &Validator::validateRoot));
 	this->funcMap.insert(std::make_pair("cgi_path", &Validator::validateCgiPath));
 	this->funcMap.insert(std::make_pair("cgi_ext", &Validator::validateCgiExt));
+	this->funcMap.insert(std::make_pair("error_page", &Validator::validateErrorPage));
 	return ;
 }
        /*♡♡♡♡♡♡♡♡♡♡♡♡FT_FOR_VALIDATION♡♡♡♡♡♡♡♡♡♡♡*/
+void	Validator::validateErrorPage(const std::vector<std::string> & prmtrs)
+{
+	if (prmtrs.size() > 1)
+		throw VectorSizeToHight();
+	if (prmtrs.size() < 1)
+		throw VectorSizeToLow();
+	if (prmtrs[0].size() < 1)
+		throw Empty();
+	validatePath(prmtrs[0]);
+}
+
 void	Validator::validateCgiExt(const std::vector<std::string>& prmtrs)
 {
 	size_t pos = 0;

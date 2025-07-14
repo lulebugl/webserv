@@ -47,9 +47,9 @@ void Node::addDefualtParm( void )
 		std::vector<std::string> vecIp;
 		vecIp.push_back("127.0.0.1");
 		prmtrs.insert(std::make_pair("host", vecIp));
-		/*std::vector<std::string> vecName;
-		vecName.push_back("None");
-		prmtrs.insert(std::make_pair("server_name", vecName));*/
+		std::vector<std::string> vecName;
+		vecName.push_back("webserv");
+		prmtrs.insert(std::make_pair("server_name", vecName));
 
 	}
 	if (this->name != "cgi-bin")
@@ -57,9 +57,12 @@ void Node::addDefualtParm( void )
 		std::vector<std::string> vecAuto;
 		vecAuto.push_back("off");
 		prmtrs.insert(std::make_pair("autoindex", vecAuto));
-		std::vector<std::string> vecMetho;
-		vecMetho.push_back("GET");
-		prmtrs.insert(std::make_pair("allow_methods", vecMetho));
+		if (this->name != "server")
+		{
+			std::vector<std::string> vecMetho;
+			vecMetho.push_back("GET");
+			prmtrs.insert(std::make_pair("allow_methods", vecMetho));
+		}
 		std::vector<std::string> vecIndex;
 		vecIndex.push_back("index.html");
 		prmtrs.insert(std::make_pair("index", vecIndex));
@@ -74,7 +77,15 @@ int Node::pushArgInMap( void )
         if (!it->empty() && (*it)[it->size() - 1] != ';')
 			key = *it;
 		if (key == "error_page" && it + 1 != array.end())
-			key = key + " " + *(it + 1);
+		{
+			std::vector<std::string>::iterator tmp = it + 1;
+			while (tmp != array.end() && !tmp->empty() && (*tmp)[tmp->size() - 1] != ';' )
+			{
+				key += " " + *tmp;
+				it++;
+				tmp++;
+			}
+		}
         ++it;
         std::vector<std::string>::iterator start = it;
         std::vector<std::string>::iterator end = it;
