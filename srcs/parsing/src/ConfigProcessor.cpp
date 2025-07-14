@@ -6,7 +6,7 @@
 /*   By: jfranco <jfranco@student.s19.be>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 19:28:53 by jfranco           #+#    #+#             */
-/*   Updated: 2025/07/14 18:41:03 by jfranco          ###   ########.fr       */
+/*   Updated: 2025/07/14 20:03:53 by jfranco          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -752,6 +752,19 @@ static bool CheckFileStream(std::ifstream& file, const std::string& filename)
     return true;
 }
 
+int ConfigProcessor::valideteSize( void ) const
+{
+	if (this->tree.size() < 1)
+	{
+		Logger::error() << "No found a valid config";
+		return (1);
+	}
+	return (0);
+/* ♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡
+ * TODO: Verifircare che non ci siano tre livelli
+ ♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡ */
+}
+
 int	ConfigProcessor::tokenize( void )
 {
 	if (ValidationPath() == 1)
@@ -790,6 +803,8 @@ int	ConfigProcessor::tokenize( void )
 	if (StreamErrorFind(tokenStream) == 1)	
 		return (1);
 	RicorsiveTree(tokenStream);
+	if (valideteSize() == 1)
+		return (1);
 	if (recursiveMap() == 1)
 		return (1);
 	if (validationParameters() == 1)

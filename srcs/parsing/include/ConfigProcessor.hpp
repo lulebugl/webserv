@@ -215,6 +215,7 @@ class ConfigProcessor
 	   int		ValidationPath( void ) const;
 	   int		validateCgiBin( void ) const;
 	   int		validateErrorPage( void );
+		int valideteSize( void ) const;
 		int	countBracket() const;
 		int	validationParameters( void );
 		int	heandelError(ValidateFunction fun, std::map<std::string, std::vector<std::string> >::iterator itPrmtrs, const std::string &name);

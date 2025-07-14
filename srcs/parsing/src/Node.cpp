@@ -86,7 +86,8 @@ int Node::pushArgInMap( void )
 				tmp++;
 			}
 		}
-        ++it;
+		if ( it + 1 != array.end() )
+			++it;
         std::vector<std::string>::iterator start = it;
         std::vector<std::string>::iterator end = it;
         while (it != array.end())
@@ -101,6 +102,14 @@ int Node::pushArgInMap( void )
         }
 		if (!key.empty())
 			prmtrs.insert(std::make_pair(key, std::vector<std::string>(start, end + 1)));
+		else if (key.empty())
+		{
+			if (start != array.begin())
+				Logger::error() << "Syntax error at: " << *(start - 1 );
+			else
+				Logger::error() << "Syntax error";
+			return (1);
+		}
 		key.clear();
     }
 	if (clearMap() == 1)
