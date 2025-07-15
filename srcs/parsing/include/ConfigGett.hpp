@@ -16,16 +16,35 @@ class Location
 	std::string name;
 	std::map<std::string, std::vector<std::string> > prmtrs; 
 	public:
+	const size_t		getClientMaxBodySize( void )const;
+	const bool			getAutoIndex( void ) const;
+	const std::string*	getRoot( void ) const;
+	const std::string*	getIndex( void ) const;
+	const bool			getMethodIsAllowed(const std::string& method) const;
+	const std::string*	getAlias() const;
+
 };
-class Servers
+class Server
 {
 	private:
 	std::string name;
-	std::map<std::string, Location*> route;
+	std::map<std::string, Location> route;
 	std::vector<Location> location;
 	std::map<std::string, std::vector<std::string> > prmtrs; 
 	public:
+	const std::string&	getName( void ) const;
+	const size_t		getHost( void )const;
+	const size_t		getClientMaxBodySize( void )const;
+	const bool			getAutoIndex( void ) const;
+	const std::string*	getRoot( void ) const;
+	const std::string*	getIndex( void ) const;
+	const int			getPort( void ) const;
+	const Location*		getLocation(const std::string& uri) const;
+	const Location*		getCgiBin( void ) const;
+	const std::string*	getErrorPageLocation(const std::string& uri, const std::string& nbrError)const;
+	const std::string*	getErrorPage(const std::string& nbrError) const;
 };
+
 class	ConfigGett
 {
 	public:
@@ -34,23 +53,9 @@ class	ConfigGett
 //
 //
 //        // ♡ Returns a const reference to the main vector of server nodes ♡
-//        const std::vector<Servers>& getVectorOfServer(void) const;
+//        const std::vector<const Servers>& getVectorOfServer(void) const;
 //
-//        // ♡ Returns a const reference to the complete map of servers indexed by port ♡
-//        const std::map<int, Servers*>& getFullMap(void) const;
 //
-//        // ♡ Returns a const pointer to the map of routes (uri -> Node*) for a server by its port ♡
-//        // ♡ Returns nullptr if the port does not exist ♡
-//        const std::map<std::string, Servers>* getMapOfOneServer(int port) const;
-//
-//        // ♡ Returns a const pointer to the route node specified by port and URI ♡
-//        // ♡ Returns nullptr if not found .
-//        const Node* getRouteNode(const std::string& port, const std::string& uri) const;
-//        const Node* getRouteNode(int port, const std::string& uri) const;
-//
-//        // ♡ Returns a const pointer to the server node associated with the specified port ♡
-//        // ♡ Returns nullptr if the port does not exist ♡
-//        const Node* getServerNode(int port) const;
 //
 //        // ♡ Returns a const reference to the vector containing all configured server ports ♡
 //        const std::vector<int>& getAllPorts() const;
@@ -61,15 +66,9 @@ class	ConfigGett
 //		bool getMethod(int port, const std::string& uri, const std::string& Methods) const;
 //		bool getIsAutoIndex(int port, const std::string& uri, const std::string& Methods)const;
 //		bool getIsAutoIndex(int port, const std::string& Methods)const;
+//		const std::string* getIndex(int port, const)
 //
 //
-//        // ♡ Returns a const pointer to the vector of strings associated with a key (parameter) for a server specified by port ♡
-//        // ♡ Returns nullptr if the port or key do not exist ♡
-//        const std::vector<std::string>* getParam(int port, const std::string& key) const;
-//
-//        // ♡♡♡ Returns a const pointer to the vector of strings associated with a key (parameter) for a route specified by port and URI ♡
-//        // ♡♡♡ Returns nullptr if the port, URI, or key do not exist ♡
-//        const std::vector<std::string>* getParam(int port, const std::string& uri, const std::string& key) const;
 //
 //		//♡♡♡ Returns the custom error page path for a given port and URI, checking location-level config first.♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡
 //		//♡♡♡ Falls back to server-level config if no match is found in the location.                           ♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡
@@ -79,34 +78,12 @@ class	ConfigGett
 //		//♡♡♡ Does not consider URI-specific location blocks.                                            ♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡
 //		const std::string*	getErrorPage(int port, const std::string& error ) const;
 //
-//		const std::string*	ServerName(int port) const ;
-//		const std::string*	ServerRoot(int port) const ;
-//		const size_t		GetMaxBody(int port) const ;
-//		const size_t		GetMaxBody(int port, const std::strin& uri) const ;
 
 	private:
 
 		   std::vector<Node>		tree;
-		   std::vector<Servers>		servers;
+		   std::vector<Server>		servers;
 		   std::map<int, Node*>		MapNode;
 		   std::vector<int>		allPort;
 
 };
-
-
-void opokopkda
-{
-	const std::vector<int> port = getAllPorts();
-	std::vector<int>::const_iterator it = port.begin();
-	while ( )
-	{
-		ServerName( *it );
-		S
-	}
-	const std::vector<Node*> Servers = getVectorOfServer();
-	Servers.getName();
-	for (auto it = servers.begin() ...)) {
-		initialize(*it);
-	}
-
-}
