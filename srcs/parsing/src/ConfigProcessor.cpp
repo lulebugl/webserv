@@ -6,7 +6,7 @@
 /*   By: jfranco <jfranco@student.s19.be>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 19:28:53 by jfranco           #+#    #+#             */
-/*   Updated: 2025/07/14 20:03:53 by jfranco          ###   ########.fr       */
+/*   Updated: 2025/07/15 17:48:25 by jfranco          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -364,7 +364,8 @@ int ConfigProcessor::validateForbiddenParameters( void ) const
 	{
 		for (size_t i = 0; i < it_->children.size(); ++i)
 		{
-			verifyInvalidParamsInContext(it_->children[i].name, it_->children[i]);
+			if (verifyInvalidParamsInContext(it_->children[i].name, it_->children[i]) == 1)
+				return (1);
 			if (it_->children[i].name == "cgi-bin")
 			{
 				if (it_->children[i].prmtrs.count("cgi_ext") < 1)
@@ -396,15 +397,19 @@ int	ConfigProcessor::verifyInvalidParamsInContext(const std::string& name, const
 	vecNoAll.push_back("listen");
 	vecNoAll.push_back("host");
 	vecNoAll.push_back("server_name");
-	vecNoAll.push_back("error_page");
+//	vecNoAll.push_back("error_page");
 	if (name == "cgi-bin")
 	{
-	    vecNoAll.push_back("allow_methods");
-	    vecNoAll.push_back("autoindex");
+	    vecNoAll.push_back("allow_methods"); // TODO: Check if possible in cgi
+	    vecNoAll.push_back("autoindex"); // TODO: Check if possible in cgi
 	    vecNoAll.push_back("alias");
 	    vecNoAll.push_back("return");
 	}
-
+	else 
+	{
+		vecNoAll.push_back("cgi_ext");
+		vecNoAll.push_back("cgi_path");
+	}
 	for (size_t i = 0; i < vecNoAll.size(); i++)
 	{
 		std::map<std::string, std::vector<std::string> >::const_iterator itPrmtrs = it.prmtrs.find(vecNoAll[i]);
