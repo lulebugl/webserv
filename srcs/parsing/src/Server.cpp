@@ -41,10 +41,13 @@ bool Server::getAutoIndex() const
 
 const std::string* Server::getRoot() const
 {
+	static const std::string defaultRoot = "./";
     std::map<std::string, std::vector<std::string> >::const_iterator it = prmtrs.find("root");
     if (it != prmtrs.end() && !it->second.empty())
+	{
         return &(it->second[0]);
-    return NULL;
+	}
+	return &defaultRoot;
 }
 
 const std::string* Server::getIndex() const

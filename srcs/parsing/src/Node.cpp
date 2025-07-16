@@ -39,6 +39,9 @@ for (; it != prmtrs.end(); ++it)
 
 void Node::addDefualtParm( void )
 {
+	std::vector<std::string> vecRoot;
+	vecRoot.push_back("./");
+	prmtrs.insert(std::make_pair("root", vecRoot));
 	if (this->name == "server")
 	{
 		std::vector<std::string> vec;

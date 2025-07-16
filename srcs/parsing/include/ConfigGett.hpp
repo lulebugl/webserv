@@ -18,13 +18,14 @@ class Location
 	std::map<std::string, std::vector<std::string> > prmtrs; 
 	const std::string& getName(void);
 	Location(const std::map<std::string, std::vector<std::string> >& passprmtrs, const std::string& nameLocation);
-	//TODO
-//	const size_t		getClientMaxBodySize( void )const;
-//	const bool			getAutoIndex( void ) const;
-//	const std::string*	getRoot( void ) const;
-//	const std::string*	getIndex( void ) const;
-//	const bool			getMethodIsAllowed(const std::string& method) const;
-//	const std::string*	getAlias() const;
+
+	size_t				getClientMaxBodySize( void )const;
+	bool				getAutoIndex( void ) const;
+	const std::string*	getRoot( void ) const;
+	const std::string*	getIndex( void ) const;
+	bool				getMethodIsAllowed(const std::string& method) const;
+	const std::string*	getAlias( void ) const;
+	const std::string*	getReturn( void ) const;
 
 };
 class Server
@@ -37,12 +38,12 @@ class Server
 	std::map<std::string, Location> route;
 	std::vector<Location> location;
 	const std::string&	getName( void ) const;
-	 size_t		getHost( void )const;
-	 size_t		getClientMaxBodySize( void )const;
-	 bool			getAutoIndex( void ) const;
+	size_t				getHost( void )const;
+	size_t				getClientMaxBodySize( void )const;
+	bool				getAutoIndex( void ) const;
 	const std::string*	getRoot( void ) const;
 	const std::string*	getIndex( void ) const;
-	 int			getPort( void ) const;
+	int					getPort( void ) const;
 	const Location&		getLocation(const std::string& uri) const;
 	const Location&		getCgiBin( void ) const;
 	const std::string*	getErrorPageLocation(const std::string& uri, const std::string& nbrError)const;
@@ -61,6 +62,7 @@ class	ConfigGett
 		ConfigGett(const ConfigProcessor& Parser );
 		void	CreateServerAndLocation( void );
 		virtual ~ConfigGett();
+		const std::vector<Server> getVectorServers( void ) const;
 
 //		//♡♡♡ Returns the custom error page path for a given port and URI, checking location-level config first.♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡
 //		//♡♡♡ Falls back to server-level config if no match is found in the location.                           ♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡

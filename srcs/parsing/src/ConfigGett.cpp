@@ -34,6 +34,10 @@ void	ConfigGett::CreateServerAndLocation( void )
 		++it;
 	}
 }
+const std::vector<Server> ConfigGett::getVectorServers() const
+{
+	return this->servers;
+}
 
 const std::string*	ConfigGett::getErrorPage(int port, const std::string& error, const std::string& uri) const
 {
