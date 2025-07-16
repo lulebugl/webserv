@@ -26,9 +26,17 @@ void	ConfigGett::CreateServerAndLocation( void )
 		Server current(it->prmtrs, it->name);
 		for (size_t i = 0; i < it->children.size(); ++i)
 		{
-			Location Lcurrent(it->children[i].prmtrs, it->children[i].name);
-			current.location.push_back(Lcurrent);
-            current.route.insert(std::make_pair(Lcurrent.getName(), Lcurrent));
+			if (it->children[i].name != "cgi-bin")
+			{
+				Location Lcurrent(it->children[i].prmtrs, it->children[i].name);
+				current.location.push_back(Lcurrent);
+        	    current.route.insert(std::make_pair(Lcurrent.getName(), Lcurrent));
+			}
+			else
+			{
+				CgiBin	Cgicurrent(it->children[i].prmtrs, it->children[i].name);
+				current.setCgi(Cgicurrent);
+			}
 		}
 		this->servers.push_back(current);
 		++it;

@@ -1,9 +1,21 @@
 #include "../include/ConfigGett.hpp"
 
 Server::Server(const std::map<std::string, std::vector<std::string> >& prmtrs, const std::string& name)
-    : name(name), prmtrs(prmtrs)
+    : name(name), prmtrs(prmtrs), Cgi(false)
 {
 	return ;
+}
+
+void	Server::setCgi(const CgiBin& add)
+{
+	if (this->Cgi == true)
+		return ;
+	else
+	{
+		this->CGIloc = add;
+	}
+	this->Cgi = true;
+
 }
 
 const std::string& Server::getName() const
@@ -76,14 +88,9 @@ const Location& Server::getLocation(const std::string& uri) const
 	//TODO:magari girare un eccezione
 }
 
-const Location& Server::getCgiBin( void ) const 
+const CgiBin& Server::getCgiBin( void ) const 
 {
-    std::map<std::string, Location>::const_iterator it = route.find("cgi-bin");
-    if (it != route.end())
-        return (it->second);
-	else
-		throw NotFoundUri();
-	//TODO:magari girare un eccezione
+	return this->CGIloc;
 }
 
 const std::string* Server::getErrorPageLocation(const std::string& uri, const std::string& nbrError) const

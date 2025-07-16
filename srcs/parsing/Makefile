@@ -28,6 +28,7 @@ SRCS = $(SRC_DIR)/ConfigProcessor.cpp\
 	$(SRC_DIR)/ConfigGett.cpp\
 	$(SRC_DIR)/Server.cpp\
 	$(SRC_DIR)/Location.cpp\
+	$(SRC_DIR)/CgiBin.cpp\
 	../lib/logger.cpp
  	
 

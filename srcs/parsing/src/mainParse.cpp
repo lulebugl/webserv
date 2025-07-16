@@ -22,11 +22,18 @@ int	main(int argv, char **argc)
 			Logger::info() << ClassServers[i].getAutoIndex();
 			Logger::info() << *(ClassServers[i].getRoot());
 			Logger::info() << *(ClassServers[i].getIndex());
+			CgiBin CGIcurrent = ClassServers[i].getCgiBin();
+			Logger::info() << *(CGIcurrent.getRoot());
+			const std::vector<std::string> *CgiPath = CGIcurrent.getPath();
+			for (size_t i = 0; i < CgiPath->size(); ++i)
+			{
+				std::cout << (*CgiPath)[i] << "\n";
+			}
 			std::cout << "\n\n";
 
 		try
 		{
-			Location uri = ClassServers[i].getLocation("/tours");
+			Location uri = ClassServers[i].getLocation("/happie");
 			std::cout << uri.getName() << std::endl;
 			std::cout << uri.getMethodIsAllowed("DELETE") << std::endl;
 		}

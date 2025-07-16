@@ -10,6 +10,19 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "ConfigProcessor.hpp"
+struct CgiBin
+{
+	CgiBin(const std::map<std::string, std::vector<std::string> >& passprmtrs, const std::string& nameLocation);
+	std::string name;
+	std::map<std::string, std::vector<std::string> > prmtrs; 
+	CgiBin();
+
+	const std::vector<std::string>* getPath( void ) const;
+	const std::vector<std::string>* getExt( void ) const;
+	const std::string*				getRoot( void ) const;
+
+};
+
 class Location
 {
 	private:
@@ -28,15 +41,20 @@ class Location
 	const std::string*	getReturn( void ) const;
 
 };
+
 class Server
 {
 	private:
-	std::string name;
-	std::map<std::string, std::vector<std::string> > prmtrs; 
+	std::string											name;
+	std::map<std::string, std::vector<std::string> >	prmtrs; 
+	CgiBin												CGIloc;
+	bool												Cgi;
 	public:
 	Server(const std::map<std::string, std::vector<std::string> >& passprmtrs, const std::string& nameServer);
 	std::map<std::string, Location> route;
 	std::vector<Location> location;
+
+	void				setCgi(const CgiBin& add);
 	const std::string&	getName( void ) const;
 	size_t				getHost( void )const;
 	size_t				getClientMaxBodySize( void )const;
@@ -45,7 +63,7 @@ class Server
 	const std::string*	getIndex( void ) const;
 	int					getPort( void ) const;
 	const Location&		getLocation(const std::string& uri) const;
-	const Location&		getCgiBin( void ) const;
+	const CgiBin&		getCgiBin( void ) const;
 	const std::string*	getErrorPageLocation(const std::string& uri, const std::string& nbrError)const;
 	const std::string*	getErrorPage(const std::string& nbrError) const;
 
