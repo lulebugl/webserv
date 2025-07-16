@@ -156,6 +156,7 @@ void RequestHandler::processGetRequest() {
             _response.setStatusCode(HTTP_FORBIDDEN);
             return;
         }
+        
     }
     if (!isReadable(fullPath) || !isFile(fullPath)) {
         _response.setStatusCode(HTTP_FORBIDDEN);

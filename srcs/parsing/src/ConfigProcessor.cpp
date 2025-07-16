@@ -46,9 +46,6 @@ std::vector<Node> ConfigProcessor::getVectorOfServer( void ) const
 	return this->tree;
 }
 
-
-
-
  std::map<int, Node> ConfigProcessor::getFullMap( void ) const
 {
 	return this->Servers;
