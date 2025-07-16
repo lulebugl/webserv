@@ -19,11 +19,11 @@ static std::string getLastModifiedTime(const std::string& path) {
     return "";
 }
 
-RequestHandler::RequestHandler() : _rootPath("/Users/lucaslebugle/Documents/42/webserv/www") {}
+RequestHandler::RequestHandler(ServerConf& serverConfig): _serverConfig(serverConfig), _rootPath(*serverConfig.getRoot()) {}
 
 RequestHandler::~RequestHandler() {}
 
-void RequestHandler::setServerConfig(const ServerConfig& config) {
+void RequestHandler::setServerConfig(const ServerConf& config) {
     _serverConfig = config;
 }
 void RequestHandler::setRequest(const HttpRequest& request) {
@@ -111,7 +111,7 @@ void RequestHandler::handleRequest(const std::string& request) {
 
 void RequestHandler::sendResponse(int socket_fd) {
     std::string responseString = _response.toString();
-    //Logger::debug() << "Sending response:\n" << responseString;
+    // Logger::debug() << "Sending response:\n" << responseString;
     send(socket_fd, responseString.c_str(), responseString.size(), 0);
     if (_response.getConnection() == "close") {
         close(socket_fd);
@@ -146,12 +146,16 @@ void RequestHandler::processGetRequest() {
         return;
     }
     if (isDirectory(fullPath)) {
-        _response.setStatusCode(HTTP_OK);
-        _response.setContent(getHtmlIndexPage(_rootPath, _request.getUri()));
-        _response.setContentType("text/html");
-        return;
-        // _response.setStatusCode(HTTP_FORBIDDEN);
-        // return;
+        if (_serverConfig.getAutoIndex()) {
+            _response.setStatusCode(HTTP_OK);
+            _response.setContent(
+                getHtmlIndexPage(_rootPath, _request.getUri()));
+            _response.setContentType("text/html");
+            return;
+        } else {
+            _response.setStatusCode(HTTP_FORBIDDEN);
+            return;
+        }
     }
     if (!isReadable(fullPath) || !isFile(fullPath)) {
         _response.setStatusCode(HTTP_FORBIDDEN);

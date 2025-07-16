@@ -3,17 +3,17 @@
 
 #include <filesystem>
 
-#include "ConfigGett.hpp"
+#include "../parsing/include/ConfigGett.hpp"
 #include "HttpRequest.hpp"
 #include "HttpResponse.hpp"
 
 class RequestHandler {
    public:
-    RequestHandler(ServerConf& serverConfig) : _serverConfig(serverConfig) {};
+    RequestHandler(ServerConf& serverConfig);
     ~RequestHandler();
 
     void handleRequest(const std::string& request);
-    void setServerConfig(const ServerConfig& config);
+    void setServerConfig(const ServerConf& config);
     void sendResponse(int socket_fd);
 
    private:
