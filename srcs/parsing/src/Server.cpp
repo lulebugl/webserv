@@ -1,11 +1,17 @@
 #include "../include/ConfigGett.hpp"
 
+Server::Server(const std::map<std::string, std::vector<std::string> >& prmtrs, const std::string& name)
+    : name(name), prmtrs(prmtrs)
+{
+	return ;
+}
+
 const std::string& Server::getName() const
 {
     return name;
 }
 
-const size_t Server::getHost() const
+size_t Server::getHost() const
 {
     std::map<std::string, std::vector<std::string> >::const_iterator it
         = prmtrs.find("host");
@@ -14,7 +20,7 @@ const size_t Server::getHost() const
     return 0;
 }
 
-const size_t Server::getClientMaxBodySize() const
+size_t Server::getClientMaxBodySize() const
 {
     std::map<std::string, std::vector<std::string> >::const_iterator it = prmtrs.find("client_max_body_size");
     if (it != prmtrs.end() && !it->second.empty())
@@ -22,7 +28,7 @@ const size_t Server::getClientMaxBodySize() const
     return 0;
 }
 
-const bool Server::getAutoIndex() const
+bool Server::getAutoIndex() const
 {
     std::map<std::string, std::vector<std::string> >::const_iterator it = prmtrs.find("autoindex");
     if (it != prmtrs.end() && !it->second.empty())
@@ -57,21 +63,23 @@ int	 Server::getPort() const
     return 0;
 }
 
-const Location* Server::getLocation(const std::string& uri) const 
+const Location& Server::getLocation(const std::string& uri) const 
 {
     std::map<std::string, Location>::const_iterator it = route.find(uri);
     if (it != route.end())
-        return &(it->second);
-    return NULL;
+        return (it->second);
+	else
+		throw NotFoundUri();
 	//TODO:magari girare un eccezione
 }
 
-const Location* Server::getCgiBin( void ) const 
+const Location& Server::getCgiBin( void ) const 
 {
     std::map<std::string, Location>::const_iterator it = route.find("cgi-bin");
     if (it != route.end())
-        return &(it->second);
-    return NULL;
+        return (it->second);
+	else
+		throw NotFoundUri();
 	//TODO:magari girare un eccezione
 }
 
@@ -106,4 +114,6 @@ const std::string* Server::getErrorPage(const std::string& nbrError) const
     }
     return NULL;
 }
-
+const char* Server::NotFoundUri::what() const throw() {
+    return "URI not found";
+}

@@ -10,8 +10,10 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "../include/ConfigGett.hpp"
+
 ConfigGett::ConfigGett( const ConfigProcessor &Parser)
-	: tree(Parser.getVectorOfServer), allPort(Parser.getAllPorts()), MapNode(Parser.getFullMap()) 
+	: tree(Parser.getVectorOfServer()), allPort(Parser.getAllPorts()), MapNode(Parser.getFullMap()) 
 {
 	CreateServerAndLocation();
 }
@@ -21,18 +23,14 @@ void	ConfigGett::CreateServerAndLocation( void )
 	std::vector<Node>::const_iterator it = this->tree.begin();
 	while (it != this->tree.end())
 	{
-		Server current;
-		current.prmtrs = it->prmtrs;
-		current.name = it->name;
+		Server current(it->prmtrs, it->name);
 		for (size_t i = 0; i < it->children.size(); ++i)
 		{
-			Location Lcurrent;
-			Lcurrent.prmtrs = it->children[i].prmtrs;
-			Lcurrent.name = it->children[i].name;
-			current.locations.push_back(Lcurrent);
-            current.route.insert(std::make_pair(Lcurrent.name, Lcurrent));
+			Location Lcurrent(it->children[i].prmtrs, it->children[i].name);
+			current.location.push_back(Lcurrent);
+            current.route.insert(std::make_pair(Lcurrent.getName(), Lcurrent));
 		}
-		this->Servers.push_back(current);
+		this->servers.push_back(current);
 		++it;
 	}
 }
@@ -41,10 +39,10 @@ const std::string*	ConfigGett::getErrorPage(int port, const std::string& error, 
 {
 	size_t	pos;
 
-	std::map<int, Node*>::const_iterator it = Servers.find( port );
-	if (it != Servers.end())
+	std::map<int, Node>::const_iterator it = MapNode.find( port );
+	if (it != MapNode.end())
 	{
-		const Node *current =  it->second->findChildNode( uri );
+		const Node *current =  it->second.findChildNode( uri );
 		if (!current)
 		{
 			return NULL;
@@ -58,8 +56,8 @@ const std::string*	ConfigGett::getErrorPage(int port, const std::string& error, 
 			}
 			++itChildren;
 		}
-		std::map<std::string, std::vector<std::string> >::const_iterator itMain = it->second->prmtrs.begin();
-		while (itMain != it->second->prmtrs.end())
+		std::map<std::string, std::vector<std::string> >::const_iterator itMain = it->second.prmtrs.begin();
+		while (itMain != it->second.prmtrs.end())
 		{
 			if ((pos = itMain->first.find(error, 0))  !=std::string::npos)
 			{
@@ -74,11 +72,11 @@ const std::string*	ConfigGett::getErrorPage(int port, const std::string& error, 
 const std::string*	ConfigGett::getErrorPage(int port, const std::string& error ) const
 {
 	size_t	pos;
-	std::map<int, Node*>::const_iterator it = Servers.find( port );
-	if (it != Servers.end())
+	std::map<int, Node>::const_iterator it = MapNode.find( port );
+	if (it != MapNode.end())
 	{
-		std::map<std::string, std::vector<std::string> >::const_iterator itMain = it->second->prmtrs.begin();
-		while (itMain != it->second->prmtrs.end())
+		std::map<std::string, std::vector<std::string> >::const_iterator itMain = it->second.prmtrs.begin();
+		while (itMain != it->second.prmtrs.end())
 		{
 			if ((pos = itMain->first.find(error, 0))  !=std::string::npos)
 			{
@@ -88,4 +86,10 @@ const std::string*	ConfigGett::getErrorPage(int port, const std::string& error )
 		}
 	}
 	return NULL;
+}
+
+
+ConfigGett::~ConfigGett()
+{
+	return;
 }

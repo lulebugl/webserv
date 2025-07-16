@@ -41,166 +41,25 @@ std::string ConfigProcessor::getBuffer( void ) const
 	return (this->Buffer);
 }
 
-const Node* ConfigProcessor::getRouteNode(int port, const std::string& uri)const
-{
-	std::map<int, Node*>::const_iterator it = Servers.find(port);
-    if (it != Servers.end())
-        return it->second->findChildNode(uri);
-    else
-        return NULL;
-}
-
-       /*♡♡♡♡♡♡♡♡♡♡♡OVERLAOD♡♡♡♡♡♡♡♡♡♡♡♡♡*/
-const Node* ConfigProcessor::getRouteNode(const std::string& port, const std::string& uri)const
-{
-    std::vector<Node>::const_iterator it = tree.begin();
-    while(it != tree.end())
-    {
-        std::map<std::string, std::vector<std::string> >::const_iterator listen = it->prmtrs.find("listen");
-		if (listen != it->prmtrs.end() && !listen->second.empty() && listen->second[0] == port)
-		{
-			return it->findChildNode( uri );
-		}
-         ++it;
-    }  
-     return NULL;    
-}
-const std::vector<Node>& ConfigProcessor::getVectorOfServer( void ) const
+std::vector<Node> ConfigProcessor::getVectorOfServer( void ) const
 {
 	return this->tree;
 }
 
 
-const std::map<std::string, Node*> * ConfigProcessor::getMapOfOneServer( int port ) const
-{
-	std::map<int, Node*>::const_iterator it = Servers.find( port );
-	if (it != Servers.end())
-		return &(it->second->route);
-	else
-		return NULL;
-}
 
-const Node* ConfigProcessor::getServerNode( int port ) const
-{
-	std::map<int, Node*>::const_iterator it = Servers.find( port );
-	if (it != Servers.end())
-		return it->second;
-	else
-		return NULL;
-}
 
-bool ConfigProcessor::hasPort ( int port )
-{
-	std::vector<int>::const_iterator it = std::find( allPort.begin(), allPort.end(), port );
-	if (it != this->allPort.end())
-		return true;
-	else
-		return false;
-}
-const std::map<int, Node*>& ConfigProcessor::getFullMap( void ) const
+ std::map<int, Node> ConfigProcessor::getFullMap( void ) const
 {
 	return this->Servers;
 }
 
-const std::vector<int>& ConfigProcessor::getAllPorts( void ) const
+std::vector<int> ConfigProcessor::getAllPorts( void ) const
 {
 	return this->allPort;
 }
 
-const std::vector<std::string>* ConfigProcessor::getParam(int port, const std::string& key) const
-{
-	std::map<int, Node*>::const_iterator it = Servers.find( port );
-	if (it != Servers.end())
-	{
-		std::map<std::string, std::vector<std::string> >::const_iterator itKey= it->second->prmtrs.find( key );
-		if (itKey != it->second->prmtrs.end())
-		{
-			return &(itKey->second);
-		}
-		else
-			return NULL;
-	}
-	else
-		return NULL;
 
-}
-
-const std::vector<std::string>* ConfigProcessor::getParam(int port, const std::string& uri, const std::string& key) const
-{
-	std::map<int, Node*>::const_iterator it = Servers.find( port );
-	if (it != Servers.end())
-	{
-		const Node *current = it->second->findChildNode( uri );
-		if (!current)
-			return NULL;
-		else
-		{
-			std::map<std::string, std::vector<std::string> >::const_iterator itKey = current->prmtrs.find( key );
-			if ( itKey != current->prmtrs.end())
-			{
-				return &(itKey->second);
-			}
-			else
-				return NULL;
-		}
-
-	}
-	else
-		return NULL;
-
-}
-const std::string*	ConfigProcessor::getErrorPage(int port, const std::string& error, const std::string& uri) const
-{
-	size_t	pos;
-
-	std::map<int, Node*>::const_iterator it = Servers.find( port );
-	if (it != Servers.end())
-	{
-		const Node *current =  it->second->findChildNode( uri );
-		if (!current)
-		{
-			return NULL;
-		}
-		std::map<std::string, std::vector<std::string> >::const_iterator itChildren = current->prmtrs.begin();
-		while (itChildren != current->prmtrs.end())
-		{
-			if ((pos = itChildren->first.find(error, 0)) !=std::string::npos)
-			{
-				return &(itChildren->second[0]);
-			}
-			++itChildren;
-		}
-		std::map<std::string, std::vector<std::string> >::const_iterator itMain = it->second->prmtrs.begin();
-		while (itMain != it->second->prmtrs.end())
-		{
-			if ((pos = itMain->first.find(error, 0))  !=std::string::npos)
-			{
-				return &(itMain->second[0]);
-			}
-			itMain++;
-		}
-	}
-	return NULL;
-}
-
-const std::string*	ConfigProcessor::getErrorPage(int port, const std::string& error ) const
-{
-	size_t	pos;
-	std::map<int, Node*>::const_iterator it = Servers.find( port );
-	if (it != Servers.end())
-	{
-		std::map<std::string, std::vector<std::string> >::const_iterator itMain = it->second->prmtrs.begin();
-		while (itMain != it->second->prmtrs.end())
-		{
-			if ((pos = itMain->first.find(error, 0))  !=std::string::npos)
-			{
-				return &(itMain->second[0]);
-			}
-			itMain++;
-		}
-	}
-	return NULL;
-}
     /*♡♡♡♡♡♡♡♡♡♡♡UTILS♡♡♡♡♡♡♡♡♡♡♡♡♡*/
 void	ConfigProcessor::prepareForCore( void )
 {
@@ -225,7 +84,7 @@ void	ConfigProcessor::prepareForCore( void )
 			std::stringstream ss(listen->second[0]);
 			ss >> port;
 			this->allPort.push_back(port);
-			this->Servers.insert(std::make_pair(port, &(*it)));
+			this->Servers.insert(std::make_pair(port, *it));
 		}
 		++it;
 	}
