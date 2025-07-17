@@ -39,6 +39,7 @@ struct Validator
 		void	validateAutoIndex(const std::vector<std::string>& prmtrs);
 		void	validateMethods(const std::vector<std::string>& prmtrs);
 		void	validateCgiExt(const std::vector<std::string>& prmtrs);
+		void	validateUploadDir(const std::vector<std::string>& prmtrs);
 
        /*♡♡♡♡♡♡♡♡♡♡♡EXCPTION♡♡♡♡♡♡♡♡♡♡♡♡♡*/
 		class PortAccessDeniedException : public std::exception 

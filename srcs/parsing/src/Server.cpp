@@ -17,6 +17,16 @@ void	Server::setCgi(const CgiBin& add)
 	this->Cgi = true;
 
 }
+const std::string* Server::getServerName( void ) const
+{
+	static const std::string DefaulServerName = "webserver";
+    std::map<std::string, std::vector<std::string> >::const_iterator it = prmtrs.find("server_name");
+    if (it != prmtrs.end() && !it->second.empty())
+	{
+        return &(it->second[0]);
+	}
+	return &DefaulServerName;
+}
 
 const std::string& Server::getName() const
 {
@@ -29,7 +39,7 @@ size_t Server::getHost() const
         = prmtrs.find("host");
     if (it != prmtrs.end() && !it->second.empty())
         return static_cast<size_t>(std::atoi(it->second[0].c_str()));
-    return 0;
+    return 127001;
 }
 
 size_t Server::getClientMaxBodySize() const
@@ -37,7 +47,7 @@ size_t Server::getClientMaxBodySize() const
     std::map<std::string, std::vector<std::string> >::const_iterator it = prmtrs.find("client_max_body_size");
     if (it != prmtrs.end() && !it->second.empty())
         return static_cast<size_t>(std::atoi(it->second[0].c_str()));
-    return 0;
+    return 1024;
 }
 
 bool Server::getAutoIndex() const

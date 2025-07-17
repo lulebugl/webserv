@@ -6,7 +6,7 @@
 /*   By: jfranco <jfranco@student.s19.be>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/08 13:42:00 by jfranco           #+#    #+#             */
-/*   Updated: 2025/07/14 17:40:27 by jfranco          ###   ########.fr       */
+/*   Updated: 2025/07/17 16:43:29 by jfranco          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ Validator::Validator()
 	this->funcMap.insert(std::make_pair("cgi_path", &Validator::validateCgiPath));
 	this->funcMap.insert(std::make_pair("cgi_ext", &Validator::validateCgiExt));
 	this->funcMap.insert(std::make_pair("error_page", &Validator::validateErrorPage));
+	this->funcMap.insert(std::make_pair("upload_dir", &Validator::validateUploadDir));
 	return ;
 }
        /*♡♡♡♡♡♡♡♡♡♡♡♡FT_FOR_VALIDATION♡♡♡♡♡♡♡♡♡♡♡*/
@@ -87,6 +88,19 @@ void	Validator::validateRoot(const std::vector<std::string>& prmtrs)
 	validatePath(prmtrs[0]);
 	Logger::valide() << "root";
 }
+
+void	Validator::validateUploadDir( const std::vector<std::string>& prmtrs )
+{
+	if (prmtrs.size() > 1)
+		throw VectorSizeToHight();
+	if (prmtrs.size() < 1)
+		throw VectorSizeToLow();
+	if (prmtrs[0].size() < 1)
+		throw Empty();
+	validatePath(prmtrs[0]);
+	Logger::valide() << "Upload_dir";
+}
+
 void	Validator::validatePath(const std::string& prmtrs)
 {
 	size_t pos = 0;
@@ -113,8 +127,8 @@ void	Validator::validateListen( const std::vector<std::string>& prmtrs )
 	ss >> nbr;
 	if (nbr >  65535 || nbr < 0)
 		throw OutOfRange();
-	if (nbr < 1023 && nbr > 0)
-		throw PortAccessDeniedException();
+//	if (nbr < 1023 && nbr > 0)
+//		throw PortAccessDeniedException();
 	Logger::valide() << "listen";
 }
 
@@ -220,6 +234,10 @@ static	bool InvalidChar(char c)
 
 void	Validator::validateServerName(const std::vector<std::string>& prmtrs)
 {
+	if (prmtrs.size() > 1)
+		throw VectorSizeToHight();
+	if (prmtrs.size() < 1)
+		throw VectorSizeToLow();
 	for (size_t i = 0; i < prmtrs.size(); i++)
 	{
 		if (prmtrs[i].size() < 1)
