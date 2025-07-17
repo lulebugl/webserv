@@ -17,6 +17,16 @@ void	Server::setCgi(const CgiBin& add)
 	this->Cgi = true;
 
 }
+const std::string* Server::getUplaodDir( void ) const
+{
+    std::map<std::string, std::vector<std::string> >::const_iterator it = prmtrs.find("upload_dir");
+    if (it != prmtrs.end() && !it->second.empty())
+	{
+        return &(it->second[0]);
+	}
+	return getRoot();
+}
+
 const std::string* Server::getServerName( void ) const
 {
 	static const std::string DefaulServerName = "webserver";

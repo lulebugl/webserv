@@ -6,7 +6,7 @@
 /*   By: jfranco <jfranco@student.s19.be>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/15 16:27:30 by jfranco           #+#    #+#             */
-/*   Updated: 2025/07/17 16:46:10 by jfranco          ###   ########.fr       */
+/*   Updated: 2025/07/17 17:08:25 by jfranco          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "ConfigProcessor.hpp"
@@ -56,6 +56,7 @@ class Server
 
 	void				setCgi(const CgiBin& add);
 /* ♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡GETTER♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡♡*/
+	const std::string*	getUplaodDir( void ) const;
 	const std::string*	getServerName( void ) const;
 	const std::string&	getName( void ) const;
 	size_t				getHost( void )const;

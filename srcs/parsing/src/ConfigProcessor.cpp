@@ -6,7 +6,7 @@
 /*   By: jfranco <jfranco@student.s19.be>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 19:28:53 by jfranco           #+#    #+#             */
-/*   Updated: 2025/07/15 17:48:25 by jfranco          ###   ########.fr       */
+/*   Updated: 2025/07/17 17:10:34 by jfranco          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,9 +45,6 @@ std::vector<Node> ConfigProcessor::getVectorOfServer( void ) const
 {
 	return this->tree;
 }
-
-
-
 
  std::map<int, Node> ConfigProcessor::getFullMap( void ) const
 {
@@ -256,6 +253,7 @@ int	ConfigProcessor::verifyInvalidParamsInContext(const std::string& name, const
 	vecNoAll.push_back("listen");
 	vecNoAll.push_back("host");
 	vecNoAll.push_back("server_name");
+	vecNoAll.push_back("upload_dir");
 //	vecNoAll.push_back("error_page");
 	if (name == "cgi-bin")
 	{
